@@ -3,6 +3,7 @@
 #include <unordered_map>
 
 #include "Core.h"
+#include "GamesEngineeringBase.h"
 #include "MyMath.h"
 #include "Window.h"
 
@@ -164,7 +165,51 @@ public:
 	}
 };
 
-// Primitive
+// Constant Buffer
+struct alignas(16) ConstantBuffer1
+{
+	float time;
+};
+
+class ConstantBuffer {
+public:
+	// Create resource to store constant buffer (and CPU memory, and size)
+	ID3D12Resource* constantBuffer;
+	unsigned char* buffer;
+	unsigned int cbSizeInBytes;
+
+	void initialize(Core* core, unsigned int sizeInBytes, int frames) {
+		cbSizeInBytes = (sizeInBytes + 255) & ~255;
+		HRESULT hr;
+		D3D12_HEAP_PROPERTIES heapprops = {};
+		heapprops.Type = D3D12_HEAP_TYPE_UPLOAD;
+		heapprops.CreationNodeMask = 1;
+		heapprops.VisibleNodeMask = 1;
+		D3D12_RESOURCE_DESC cbDesc = {};
+		cbDesc.Width = cbSizeInBytes * frames;
+		cbDesc.Height = 1;
+		cbDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		cbDesc.DepthOrArraySize = 1;
+		cbDesc.MipLevels = 1;
+		cbDesc.SampleDesc.Count = 1;
+		cbDesc.SampleDesc.Quality = 0;
+		cbDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		hr = core->device->CreateCommittedResource(&heapprops, D3D12_HEAP_FLAG_NONE, &cbDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)&constantBuffer);
+		hr = constantBuffer->Map(0, NULL, (void**)&buffer);
+	}
+
+	// Update via a memcpy
+	void update(void* data, unsigned int sizeInBytes, int frame) {
+		memcpy(buffer + (frame * cbSizeInBytes), data, sizeInBytes);
+	}
+
+	// Need GPU address of contents
+	D3D12_GPU_VIRTUAL_ADDRESS getGPUAddress(int frame) {
+		return (constantBuffer->GetGPUVirtualAddress() + (frame * cbSizeInBytes));
+	}
+};
+
+// Primitive / Shader
 class Shader {
 public:
 	// Vertex and Pixel Shaders
@@ -176,6 +221,9 @@ public:
 
 	// Instance of Pipeline Stage Object Manager
 	PSOManager psos;
+
+	// ConstantBuffer
+	ConstantBuffer constantBuffer;
 
 	std::string readShader(std::string filename) {
 		std::ifstream file(filename);
@@ -200,10 +248,20 @@ public:
 
 	void initialize(Core* core) {
 		triangle.initialize(core);
+		constantBuffer.initialize(core, sizeof(ConstantBuffer1), 2);
 		compile(core);
 	}
 
-	void draw(Core* core) {
+	// Raster Triangle Draw
+	//void draw(Core* core) {
+	//	psos.bind(core, "Triangle");
+	//	triangle.draw(core);
+	//}
+
+	// Pulsing Triangle Draw
+	void draw(Core* core, ConstantBuffer1* cb) {
+		constantBuffer.update(cb, sizeof(ConstantBuffer1), core->frameIndex());
+		core->getCommandList()->SetGraphicsRootConstantBufferView(1, constantBuffer.getGPUAddress(core->frameIndex()));
 		psos.bind(core, "Triangle");
 		triangle.draw(core);
 	}
@@ -214,17 +272,22 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PST
 	Mesh mesh;
 	Core core;
 	Shader shader;
+	GamesEngineeringBase::Timer timer;
 
 	window.initialize(WIDTH, HEIGHT, "My Window");
 	core.initialize(window.hwnd, window.width, window.height);
 	shader.initialize(&core);
+
+	ConstantBuffer1 constBufferCPU;
+	constBufferCPU.time = 0;
 	
 	while (true) {
 		if (window.keys[VK_ESCAPE] == 1) break;
 		core.beginFrame();
 		core.beginRenderPass();
+		constBufferCPU.time += timer.dt();
 		window.processMessages();
-		shader.draw(&core);
+		shader.draw(&core, &constBufferCPU);
 		core.finishFrame();
 	}
 	core.flushGraphicsQueue();
