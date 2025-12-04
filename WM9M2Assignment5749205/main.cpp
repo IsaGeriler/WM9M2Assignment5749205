@@ -166,9 +166,14 @@ public:
 };
 
 // Constant Buffer
-struct alignas(16) ConstantBuffer1
-{
+struct alignas(16) ConstantBuffer1 {
 	float time;
+};
+
+struct alignas(16) ConstantBuffer2 {
+	float time;
+	float padding[3];
+	Vec4 lights[4];
 };
 
 class ConstantBuffer {
@@ -246,9 +251,15 @@ public:
 		psos.createPSO(core, "Triangle", vertexShader, pixelShader, triangle.mesh.inputLayoutDesc);
 	}
 
+	//void initialize(Core* core) {
+	//	triangle.initialize(core);
+	//	constantBuffer.initialize(core, sizeof(ConstantBuffer1), 2);
+	//	compile(core);
+	//}
+
 	void initialize(Core* core) {
 		triangle.initialize(core);
-		constantBuffer.initialize(core, sizeof(ConstantBuffer1), 2);
+		constantBuffer.initialize(core, sizeof(ConstantBuffer2), 2);
 		compile(core);
 	}
 
@@ -259,8 +270,16 @@ public:
 	//}
 
 	// Pulsing Triangle Draw
-	void draw(Core* core, ConstantBuffer1* cb) {
-		constantBuffer.update(cb, sizeof(ConstantBuffer1), core->frameIndex());
+	//void draw(Core* core, ConstantBuffer1* cb) {
+	//	constantBuffer.update(cb, sizeof(ConstantBuffer1), core->frameIndex());
+	//	core->getCommandList()->SetGraphicsRootConstantBufferView(1, constantBuffer.getGPUAddress(core->frameIndex()));
+	//	psos.bind(core, "Triangle");
+	//	triangle.draw(core);
+	//}
+
+	// Lights Spinning Triangle
+	void draw(Core* core, ConstantBuffer2* cb) {
+		constantBuffer.update(cb, sizeof(ConstantBuffer2), core->frameIndex());
 		core->getCommandList()->SetGraphicsRootConstantBufferView(1, constantBuffer.getGPUAddress(core->frameIndex()));
 		psos.bind(core, "Triangle");
 		triangle.draw(core);
@@ -278,16 +297,28 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PST
 	core.initialize(window.hwnd, window.width, window.height);
 	shader.initialize(&core);
 
-	ConstantBuffer1 constBufferCPU;
-	constBufferCPU.time = 0;
+	//ConstantBuffer1 constBufferCPU;
+	//constBufferCPU.time = 0;
 	
+	ConstantBuffer2 constBufferCPU2;
+	constBufferCPU2.time = 0;
+
 	while (true) {
 		if (window.keys[VK_ESCAPE] == 1) break;
 		core.beginFrame();
 		core.beginRenderPass();
-		constBufferCPU.time += timer.dt();
+		// constBufferCPU.time += timer.dt();
+
+		constBufferCPU2.time += timer.dt();
+		for (int i = 0; i < 4; i++) {
+			float angle = constBufferCPU2.time + (i * M_PI / 2.0f);
+			constBufferCPU2.lights[i] = Vec4(WIDTH / 2.0f + (cosf(angle) * (WIDTH * 0.3f)),
+				HEIGHT / 2.0f + (sinf(angle) * (HEIGHT * 0.3f)),
+				0, 0);
+		}
+
 		window.processMessages();
-		shader.draw(&core, &constBufferCPU);
+		shader.draw(&core, &constBufferCPU2);
 		core.finishFrame();
 	}
 	core.flushGraphicsQueue();
