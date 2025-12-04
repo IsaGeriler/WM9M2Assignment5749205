@@ -128,6 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core.h" />
+    <ClInclude Include="MyMath.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
