@@ -52,11 +52,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			window->mouseButtons[2] = false;
 			return 0;
 		}
-		case WM_MOUSEWHEEL: {
-			window->updateMouse(WINDOW_GET_X_LPARAM(lParam), WINDOW_GET_Y_LPARAM(lParam));
-			window->mouseWheel += GET_WHEEL_DELTA_WPARAM(wParam);
-			return 0;
-		}
 		case WM_MOUSEMOVE: {
 			window->updateMouse(WINDOW_GET_X_LPARAM(lParam), WINDOW_GET_Y_LPARAM(lParam));
 			return 0;
@@ -67,12 +62,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	}
 }
 
-Window::~Window() {
-	ShowCursor(true);
-	ClipCursor(NULL);
-}
-
-void Window::initialize(int _width, int _height, std::string _name, float _zoom, bool window_fullscreen, int window_x, int window_y) {
+void Window::initialize(int _width, int _height, std::string _name, int window_x, int window_y) {
 	WNDCLASSEX wc;
 	hinstance = GetModuleHandle(NULL);
 	name = _name;
@@ -90,36 +80,11 @@ void Window::initialize(int _width, int _height, std::string _name, float _zoom,
 	wc.lpszClassName = wname.c_str();
 	wc.cbSize = sizeof(WNDCLASSEX);
 	RegisterClassEx(&wc);
-	DWORD style;
 
-	// window_fullscreen
-	if (0) {
-		width = GetSystemMetrics(SM_CXSCREEN);
-		height = GetSystemMetrics(SM_CYSCREEN);
-		DEVMODE fs;
-		memset(&fs, 0, sizeof(DEVMODE));
-		fs.dmSize = sizeof(DEVMODE);
-		fs.dmPelsWidth = (unsigned long)width;
-		fs.dmPelsHeight = (unsigned long)height;
-		fs.dmBitsPerPel = 32;
-		fs.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-		ChangeDisplaySettings(&fs, CDS_FULLSCREEN);
-		style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
-	} else {
-		width = _width;
-		height = _height;
-		style = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
-	}
-
-	RECT wr = { 0, 0, width * _zoom, height * _zoom };
-	AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
-	hwnd = CreateWindowEx(WS_EX_APPWINDOW, wname.c_str(), wname.c_str(), style, window_x, window_y, wr.right - wr.left, wr.bottom - wr.top, NULL, NULL, hinstance, this);
-	invZoom = 1.0f / (float)_zoom;
-	ShowWindow(hwnd, SW_SHOW);
-	SetForegroundWindow(hwnd);
-	SetFocus(hwnd);
-	useMouseClip = false;
-	ShowCursor(true);
+	width = _width;
+	height = _height;
+	DWORD style = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
+	hwnd = CreateWindowEx(WS_EX_APPWINDOW, wname.c_str(), wname.c_str(), style, window_x, window_y, width, height, NULL, NULL, hinstance, this);
 	window = this;
 }
 
@@ -135,61 +100,4 @@ void Window::processMessages() {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-}
-
-void Window::clipMouseToWindow() {
-	RECT rect;
-	GetClientRect(hwnd, &rect);
-
-	POINT ul;
-	ul.x = rect.left;
-	ul.y = rect.top;
-	
-	POINT lr;
-	lr.x = rect.right;
-	lr.y = rect.bottom;
-	
-	MapWindowPoints(hwnd, nullptr, &ul, 1);
-	MapWindowPoints(hwnd, nullptr, &lr, 1);
-	
-	rect.left = ul.x;
-	rect.top = ul.y;
-	rect.right = lr.x;
-	rect.bottom = lr.y;
-	
-	ClipCursor(&rect);
-}
-
-void Window::checkInput() {
-	if (useMouseClip) clipMouseToWindow();
-	processMessages();
-}
-
-bool Window::keyPressed(int key) { return keys[key]; }
-
-int Window::getMouseInWindowX() {
-	POINT p;
-	GetCursorPos(&p);
-	ScreenToClient(hwnd, &p);
-	
-	RECT rect;
-	GetClientRect(hwnd, &rect);
-	
-	p.x = p.x - rect.left;
-	p.x = p.x * invZoom;
-	
-	return p.x;
-}
-int Window::getMouseInWindowY() {
-	POINT p;
-	GetCursorPos(&p);
-	ScreenToClient(hwnd, &p);
-	
-	RECT rect;
-	GetClientRect(hwnd, &rect);
-	
-	p.y = p.y - rect.top;
-	p.y = p.y * invZoom;
-	
-	return p.y;
 }
