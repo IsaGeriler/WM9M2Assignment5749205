@@ -78,6 +78,19 @@ public:
 	D3D12_RECT scissorRect;
 
 	ID3D12RootSignature* rootSignature;
+	
+	~Core() {
+		rootSignature->Release();
+		graphicsCommandList[0]->Release();
+		graphicsCommandAllocator[0]->Release();
+		graphicsCommandList[1]->Release();
+		graphicsCommandAllocator[1]->Release();
+		swapchain->Release();
+		computeQueue->Release();
+		copyQueue->Release();
+		graphicsQueue->Release();
+		device->Release();
+	}
 
 	void initialize(HWND hwnd, int _width, int _height) {
 		// Debug Layer
@@ -234,7 +247,7 @@ public:
 		//device->CreateRootSignature(0, serialized->GetBufferPointer(), serialized -> GetBufferSize(), IID_PPV_ARGS(&rootSignature));
 		//serialized->Release();
 
-		// Updated Create Root Signature
+		// (Updated) Create Root Signature
 		std::vector<D3D12_ROOT_PARAMETER> parameters;
 		D3D12_ROOT_PARAMETER rootParameterCBVS;
 		rootParameterCBVS.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
