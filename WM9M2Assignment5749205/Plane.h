@@ -12,6 +12,9 @@ public:
 	Mesh mesh;
 	std::string shadername;
 
+	std::vector<STATIC_VERTEX> vertices;
+	std::vector<unsigned int> indices;
+
 	STATIC_VERTEX addVertex(Vec3 p, Vec3 n, float tu, float tv) {
 		STATIC_VERTEX v;
 		v.pos = p;
@@ -23,13 +26,11 @@ public:
 	}
 
 	void initialize(Core* core, PSOManager* psos, ShaderManager* shaders) {
-		std::vector<STATIC_VERTEX> vertices;
 		vertices.push_back(addVertex(Vec3(-1.f, 0.f, -1.f), Vec3(0.f, 1.f, 0.f), 0.f, 0.f));
 		vertices.push_back(addVertex(Vec3(1.f, 0.f, -1.f), Vec3(0.f, 1.f, 0.f), 1.f, 0.f));
 		vertices.push_back(addVertex(Vec3(-1.f, 0.f, 1.f), Vec3(0.f, 1.f, 0.f), 0.f, 1.f));
 		vertices.push_back(addVertex(Vec3(1.f, 0.f, 1.f), Vec3(0.f, 1.f, 0.f), 1.f, 1.f));
 
-		std::vector<unsigned int> indices;
 		indices.push_back(2); indices.push_back(1); indices.push_back(0);
 		indices.push_back(1); indices.push_back(2); indices.push_back(3);
 

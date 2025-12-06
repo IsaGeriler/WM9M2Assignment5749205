@@ -9,9 +9,11 @@
 
 class Cube {
 public:
-	std::vector<STATIC_VERTEX> vertices;
 	Mesh mesh;
 	std::string shadername;
+
+	std::vector<STATIC_VERTEX> vertices;
+	std::vector<unsigned int> indices;
 
 	STATIC_VERTEX addVertex(Vec3 p, Vec3 n, float tu, float tv) {
 		STATIC_VERTEX v;
@@ -66,7 +68,6 @@ public:
 		vertices.push_back(addVertex(p0, Vec3(0.0f, -1.0f, 0.0f), 0.0f, 0.0f));
 
 		// Add indices
-		std::vector<unsigned int> indices;
 		indices.push_back(0); indices.push_back(1); indices.push_back(2);
 		indices.push_back(0); indices.push_back(2); indices.push_back(3);
 		indices.push_back(4); indices.push_back(5); indices.push_back(6);

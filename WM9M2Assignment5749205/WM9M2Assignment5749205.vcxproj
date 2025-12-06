@@ -135,6 +135,7 @@
     <ClInclude Include="Plane.h" />
     <ClInclude Include="PSOManager.h" />
     <ClInclude Include="Shaders.h" />
+    <ClInclude Include="Sphere.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

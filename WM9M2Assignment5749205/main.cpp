@@ -7,6 +7,7 @@
 #include "Plane.h"
 #include "PSOManager.h"
 #include "Shaders.h"
+#include "Sphere.h"
 #include "Timer.h"
 #include "Window.h"
 
@@ -30,6 +31,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	Cube cube;
 	cube.initialize(&core, &psos, &shaders);
+
+	Sphere skybox;
+	skybox.initialize(&core, &psos, &shaders, 64, 64, 100.f);
 	
 	Timer timer;
 	float time = 0.f;
@@ -48,10 +52,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		shaders.updateConstantVertexShaderBuffer("Plane", "staticMeshBuffer", "VP", &vp);
 		shaders.updateConstantVertexShaderBuffer("Cube", "staticMeshBuffer", "VP", &vp);
+		shaders.updateConstantVertexShaderBuffer("Sphere", "staticMeshBuffer", "VP", &vp);
 
 		core.beginRenderPass();
 		plane.draw(&core, &psos, &shaders);
 		cube.draw(&core, &psos, &shaders);
+		skybox.draw(&core, &psos, &shaders);
 		core.finishFrame();
 	}
 	core.flushGraphicsQueue();
