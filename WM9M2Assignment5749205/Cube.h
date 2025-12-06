@@ -92,8 +92,6 @@ public:
 	}
 	
 	void draw(Core* core, PSOManager* psos, ShaderManager* shaders) {
-		Matrix planeWorld = Matrix::translate(Vec3(0.f, 2.f, 0.f));
-		shaders->updateConstantVertexShaderBuffer("Cube", "staticMeshBuffer", "W", &planeWorld);
 		shaders->apply(core, shadername);
 		psos->bind(core, "CubePSO");
 		mesh.draw(core);

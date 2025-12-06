@@ -43,10 +43,8 @@ public:
 			}
 		}
 
-		for (int lat = 0; lat < rings; lat++)
-		{
-			for (int lon = 0; lon < segments; lon++)
-			{
+		for (int lat = 0; lat < rings; lat++) {
+			for (int lon = 0; lon < segments; lon++) {
 				int current = lat * (segments + 1) + lon;
 				int next = current + segments + 1;
 				indices.push_back(current);
@@ -65,12 +63,9 @@ public:
 		);
 		shadername = "Sphere";
 		psos->createPSO(core, "SpherePSO", shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getStaticLayout());
-
 	}
 
 	void draw(Core* core, PSOManager* psos, ShaderManager* shaders) {
-		Matrix planeWorld = Matrix::translate(Vec3(3.f, 0.f, 0.f));
-		shaders->updateConstantVertexShaderBuffer("Sphere", "staticMeshBuffer", "W", &planeWorld);
 		shaders->apply(core, shadername);
 		psos->bind(core, "SpherePSO");
 		mesh.draw(core);
