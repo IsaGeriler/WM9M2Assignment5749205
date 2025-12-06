@@ -1,9 +1,9 @@
 #pragma once
 
+#include <vector>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <d3dcompiler.h>
-#include <vector>
 
 #pragma comment(lib, "d3d12")
 #pragma comment(lib, "dxgi")
@@ -13,6 +13,7 @@ class Barrier {
 public:
 	static void add(ID3D12Resource* res, D3D12_RESOURCE_STATES first, D3D12_RESOURCE_STATES second, ID3D12GraphicsCommandList4* commandList) {
 		D3D12_RESOURCE_BARRIER rb = {};
+		memset(&rb, 0, sizeof(D3D12_RESOURCE_BARRIER));
 		rb.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		rb.Transition.pResource = res;
 		rb.Transition.StateBefore = first;
@@ -80,11 +81,22 @@ public:
 	ID3D12RootSignature* rootSignature;
 	
 	~Core() {
+		for (int i = 0; i < 2; i++) {
+			graphicsQueueFence[i].signal(graphicsQueue);
+			graphicsQueueFence[i].wait();
+		}
+
 		rootSignature->Release();
 		graphicsCommandList[0]->Release();
 		graphicsCommandAllocator[0]->Release();
 		graphicsCommandList[1]->Release();
 		graphicsCommandAllocator[1]->Release();
+		backbuffers[0]->Release();
+		backbuffers[1]->Release();
+		delete[] backbuffers;
+		backbufferHeap->Release();
+		dsv->Release();
+		dsvHeap->Release();
 		swapchain->Release();
 		computeQueue->Release();
 		copyQueue->Release();
@@ -130,17 +142,21 @@ public:
 
 		// Create Command Queues
 		D3D12_COMMAND_QUEUE_DESC graphicsQueueDesc = {};
+		memset(&graphicsQueueDesc, 0, sizeof(D3D12_COMMAND_QUEUE_DESC));
 		graphicsQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 		device->CreateCommandQueue(&graphicsQueueDesc, IID_PPV_ARGS(&graphicsQueue));
 		D3D12_COMMAND_QUEUE_DESC copyQueueDesc = {};
+		memset(&copyQueueDesc, 0, sizeof(D3D12_COMMAND_QUEUE_DESC));
 		copyQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COPY;
 		device->CreateCommandQueue(&copyQueueDesc, IID_PPV_ARGS(&copyQueue));
 		D3D12_COMMAND_QUEUE_DESC computeQueueDesc = {};
+		memset(&computeQueueDesc, 0, sizeof(D3D12_COMMAND_QUEUE_DESC));
 		computeQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
 		device->CreateCommandQueue(&computeQueueDesc, IID_PPV_ARGS(&computeQueue));
 
 		// Create Swapchain
 		DXGI_SWAP_CHAIN_DESC1 scDesc = {};
+		memset(&scDesc, 0, sizeof(DXGI_SWAP_CHAIN_DESC1));
 		scDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		scDesc.Width = _width;
 		scDesc.Height = _height;
@@ -157,11 +173,15 @@ public:
 
 		// Create Heap
 		D3D12_DESCRIPTOR_HEAP_DESC renderTargetViewHeapDesc = {};
+		memset(&renderTargetViewHeapDesc, 0, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
 		renderTargetViewHeapDesc.NumDescriptors = scDesc.BufferCount;
 		renderTargetViewHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+		renderTargetViewHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		device->CreateDescriptorHeap(&renderTargetViewHeapDesc, IID_PPV_ARGS(&backbufferHeap));
 
 		backbuffers = new ID3D12Resource* [scDesc.BufferCount];
+		backbuffers[0] = NULL;
+		backbuffers[1] = NULL;
 
 		D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle = backbufferHeap->GetCPUDescriptorHandleForHeapStart();
 		unsigned int renderTargetViewDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -179,6 +199,7 @@ public:
 		dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&dsvHeap));
 		dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
+		dsv = NULL;
 
 		// Fill in structs
 		D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilDesc = {};
@@ -229,11 +250,9 @@ public:
 		// Create Command Allocators and Command Lists
 		device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&graphicsCommandAllocator[0]));
 		device->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&graphicsCommandList[0]));
-		graphicsCommandList[0]->Close();
 
 		device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&graphicsCommandAllocator[1]));
 		device->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&graphicsCommandList[1]));
-		graphicsCommandList[1]->Close();
 
 		graphicsQueueFence[0].create(device);
 		graphicsQueueFence[1].create(device);
@@ -390,6 +409,7 @@ public:
 
 	// Functionality to set common draw functionality
 	void beginRenderPass() {
+		unsigned int frameIndex = swapchain->GetCurrentBackBufferIndex();
 		getCommandList()->RSSetViewports(1, &viewport);
 		getCommandList()->RSSetScissorRects(1, &scissorRect);
 		getCommandList()->SetGraphicsRootSignature(rootSignature);

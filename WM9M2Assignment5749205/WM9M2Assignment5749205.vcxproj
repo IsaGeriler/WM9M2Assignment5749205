@@ -128,9 +128,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core.h" />
-    <ClInclude Include="GamesEngineeringBase.h" />
     <ClInclude Include="GEMLoader.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="MyMath.h" />
+    <ClInclude Include="Plane.h" />
+    <ClInclude Include="PSOManager.h" />
+    <ClInclude Include="Shaders.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

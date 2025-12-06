@@ -231,7 +231,7 @@ public:
 
 	// Methods
 	// Identity Matrix
-	Matrix identity() {
+	static Matrix identity() {
 		Matrix iden;
 		for (int i = 0; i < 16; i++) (i % 5 == 0) ? iden[i] = 1 : iden[i] = 0;
 		return iden;
@@ -314,21 +314,21 @@ public:
 	}
 
 	// Translate
-	static Matrix translate(const float t) {
+	static Matrix translate(const Vec3& v) {
 		Matrix trans;
 		for (int i = 0; i < 16; i++) trans[i] = 0;
-		trans[0] = 1; trans[3] = t;
-		trans[5] = 1; trans[7] = t;
-		trans[10] = 1; trans[11] = t;
+		trans[0] = 1; trans[3] = v.x;
+		trans[5] = 1; trans[7] = v.y;
+		trans[10] = 1; trans[11] = v.z;
 		trans[15] = 1;
 		return trans;
 	}
 
 	// Scale
-	static Matrix scale(const float s) {
+	static Matrix scale(const Vec3& v) {
 		Matrix sc;
 		for (int i = 0; i < 16; i++) sc[i] = 0;
-		sc[0] = s; sc[5] = s; sc[10] = s; sc[15] = 1;
+		sc[0] = v.x; sc[5] = v.y; sc[10] = v.z; sc[15] = 1;
 		return sc;
 	}
 
