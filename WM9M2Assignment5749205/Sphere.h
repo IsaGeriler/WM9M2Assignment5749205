@@ -56,11 +56,7 @@ public:
 			}
 		}
 		mesh.initialize(core, vertices, indices);
-		shaders->loadShader(
-			core, "Sphere",
-			"C:/dev/WM9M2Assignment5749205/WM9M2Assignment5749205/VertexShader.txt",
-			"C:/dev/WM9M2Assignment5749205/WM9M2Assignment5749205/PixelShader.txt"
-		);
+		shaders->loadShader(core, "Sphere", "VertexShader.txt", "PixelShader.txt");
 		shadername = "Sphere";
 		psos->createPSO(core, "SpherePSO", shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getStaticLayout());
 	}

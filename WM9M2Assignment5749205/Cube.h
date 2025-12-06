@@ -82,11 +82,7 @@ public:
 		indices.push_back(20); indices.push_back(22); indices.push_back(23);
 
 		mesh.initialize(core, vertices, indices);
-		shaders->loadShader(
-			core, "Cube",
-			"C:/dev/WM9M2Assignment5749205/WM9M2Assignment5749205/VertexShader.txt",
-			"C:/dev/WM9M2Assignment5749205/WM9M2Assignment5749205/PixelShader.txt"
-		);
+		shaders->loadShader(core, "Cube", "VertexShader.txt", "PixelShader.txt");
 		shadername = "Cube";
 		psos->createPSO(core, "CubePSO", shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getStaticLayout());
 	}
