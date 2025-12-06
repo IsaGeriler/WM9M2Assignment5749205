@@ -82,14 +82,16 @@ public:
 		indices.push_back(20); indices.push_back(22); indices.push_back(23);
 
 		mesh.initialize(core, vertices, indices);
-		shaders->loadShader(core, "Cube", "VertexShader.txt", "PixelShader.txt");
+		shaders->loadShader(core, "Cube", "VertexShaderStatic.txt", "PixelShader.txt");
 		shadername = "Cube";
 		psos->createPSO(core, "CubePSO", shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getStaticLayout());
 	}
 	
-	void draw(Core* core, PSOManager* psos, ShaderManager* shaders) {
-		shaders->apply(core, shadername);
+	void draw(Core* core, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
 		psos->bind(core, "CubePSO");
+		shaders->updateConstantVertexShaderBuffer("Cube", "staticMeshBuffer", "W", &w);
+		shaders->updateConstantVertexShaderBuffer("Cube", "staticMeshBuffer", "VP", &vp);
+		shaders->apply(core, shadername);
 		mesh.draw(core);
 	}
 };

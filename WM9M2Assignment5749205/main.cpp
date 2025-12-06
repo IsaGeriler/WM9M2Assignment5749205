@@ -1,5 +1,5 @@
-#define WIDTH 1024
-#define HEIGHT 1024
+#define WIDTH 1920
+#define HEIGHT 1080
 
 #include "Core.h"
 #include "Cube.h"
@@ -9,6 +9,7 @@
 #include "Shaders.h"
 #include "Sphere.h"
 #include "StaticModel.h"
+#include "AnimatedModel.h"
 #include "Timer.h"
 #include "Window.h"
 
@@ -34,10 +35,16 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	cube.initialize(&core, &psos, &shaders);
 
 	Sphere sphere;
-	sphere.initialize(&core, &psos, &shaders, 32, 32, 200.f);
+	sphere.initialize(&core, &psos, &shaders, 32, 32, 500.f);
 
 	StaticModel acacia;
 	acacia.load(&core, &psos, &shaders, "Assets/acacia_003.gem");
+
+	//AnimatedModel trex;
+	//trex.load(&core, &psos, &shaders, "Assets/TRex.gem");
+
+	//AnimationInstance animatedInstance;
+	//animatedInstance.initialize(&trex.animation, 0);
 	
 	Timer timer;
 	float time = 0.f;
@@ -58,30 +65,20 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 2.f, 0.f));
 		Matrix sphereWorld = Matrix::identity();
 		Matrix acaciaWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
+		//Matrix trexWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
 
 		core.beginRenderPass();
+		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
+		plane.draw(&core, &psos, &shaders, vp, planeWorld);
+		sphere.draw(&core, &psos, &shaders, vp, sphereWorld);
+		acacia.draw(&core, &psos, &shaders, vp, acaciaWorld);
 
-		shaders.updateConstantVertexShaderBuffer("Plane", "staticMeshBuffer", "W", &planeWorld);
-		shaders.updateConstantVertexShaderBuffer("Cube", "staticMeshBuffer", "W", &cubeWorld);
-		shaders.updateConstantVertexShaderBuffer("Sphere", "staticMeshBuffer", "W", &sphereWorld);
-		shaders.updateConstantVertexShaderBuffer("StaticModelUntextured", "staticMeshBuffer", "W", &acaciaWorld);
-
-		shaders.updateConstantVertexShaderBuffer("Plane", "staticMeshBuffer", "VP", &vp);
-		shaders.updateConstantVertexShaderBuffer("Cube", "staticMeshBuffer", "VP", &vp);
-		shaders.updateConstantVertexShaderBuffer("Sphere", "staticMeshBuffer", "VP", &vp);
-		shaders.updateConstantVertexShaderBuffer("StaticModelUntextured", "staticMeshBuffer", "VP", &vp);
-
-		cube.draw(&core, &psos, &shaders);
-		plane.draw(&core, &psos, &shaders);
-		sphere.draw(&core, &psos, &shaders);
-		acacia.draw(&core, &psos, &shaders);
-
+		//animatedInstance.update("run", dt);
+		//if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
+		//trex.draw(&core, &psos, &shaders, &animatedInstance, vp, trexWorld);
+		
 		cubeWorld = Matrix::translate(Vec3(5.f, 2.f, 0.f));
-
-		shaders.updateConstantVertexShaderBuffer("Cube", "staticMeshBuffer", "W", &cubeWorld);
-		shaders.updateConstantVertexShaderBuffer("Cube", "staticMeshBuffer", "VP", &vp);
-
-		cube.draw(&core, &psos, &shaders);
+		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		core.finishFrame();
 	}
 	core.flushGraphicsQueue();

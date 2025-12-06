@@ -28,14 +28,16 @@ public:
 			mesh->initialize(core, vertices, gemmeshes[i].indices);
 			meshes.push_back(mesh);
 		}
-		shaders->loadShader(core, "StaticModelUntextured", "VertexShader.txt", "PixelShader.txt");
+		shaders->loadShader(core, "StaticModelUntextured", "VertexShaderStatic.txt", "PixelShader.txt");
 		shadername = "StaticModelUntextured";
 		psos->createPSO(core, "StaticModelPSO", shaders->getShader("StaticModelUntextured")->vertexShader, shaders->getShader("StaticModelUntextured")->pixelShader, VertexLayoutCache::getStaticLayout());
 	}
 
-	void draw(Core* core, PSOManager* psos, ShaderManager* shaders) {
-		shaders->apply(core, shadername);
-		psos->bind(core, "SpherePSO");
+	void draw(Core* core, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
+		psos->bind(core, "StaticModelPSO");
+		shaders->updateConstantVertexShaderBuffer("StaticModelUntextured", "staticMeshBuffer", "W", &w);
+		shaders->updateConstantVertexShaderBuffer("StaticModelUntextured", "staticMeshBuffer", "VP", &vp);
+		shaders->apply(core, "StaticModelUntextured");
 		for (int i = 0; i < meshes.size(); i++) meshes[i]->draw(core);
 	}
 };

@@ -35,14 +35,16 @@ public:
 		indices.push_back(1); indices.push_back(2); indices.push_back(3);
 
 		mesh.initialize(core, vertices, indices);
-		shaders->loadShader(core, "Plane", "VertexShader.txt", "PixelShader.txt");
+		shaders->loadShader(core, "Plane", "VertexShaderStatic.txt", "PixelShader.txt");
 		shadername = "Plane";
 		psos->createPSO(core, "PlanePSO", shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getStaticLayout());
 	}
 
-	void draw(Core* core, PSOManager* psos, ShaderManager* shaders) {
-		shaders->apply(core, shadername);
+	void draw(Core* core, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
 		psos->bind(core, "PlanePSO");
+		shaders->updateConstantVertexShaderBuffer("Plane", "staticMeshBuffer", "W", &w);
+		shaders->updateConstantVertexShaderBuffer("Plane", "staticMeshBuffer", "VP", &vp);
+		shaders->apply(core, shadername);
 		mesh.draw(core);
 	}
 };

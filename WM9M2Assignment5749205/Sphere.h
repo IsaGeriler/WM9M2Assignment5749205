@@ -56,14 +56,16 @@ public:
 			}
 		}
 		mesh.initialize(core, vertices, indices);
-		shaders->loadShader(core, "Sphere", "VertexShader.txt", "PixelShader.txt");
+		shaders->loadShader(core, "Sphere", "VertexShaderStatic.txt", "PixelShader.txt");
 		shadername = "Sphere";
 		psos->createPSO(core, "SpherePSO", shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getStaticLayout());
 	}
 
-	void draw(Core* core, PSOManager* psos, ShaderManager* shaders) {
-		shaders->apply(core, shadername);
+	void draw(Core* core, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
 		psos->bind(core, "SpherePSO");
+		shaders->updateConstantVertexShaderBuffer("Sphere", "staticMeshBuffer", "W", &w);
+		shaders->updateConstantVertexShaderBuffer("Sphere", "staticMeshBuffer", "VP", &vp);
+		shaders->apply(core, shadername);
 		mesh.draw(core);
 	}
 };
