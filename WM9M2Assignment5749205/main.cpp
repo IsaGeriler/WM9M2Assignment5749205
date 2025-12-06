@@ -2,6 +2,7 @@
 #define HEIGHT 1024
 
 #include "Core.h"
+#include "Cube.h"
 #include "Mesh.h"
 #include "Plane.h"
 #include "PSOManager.h"
@@ -26,11 +27,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	
 	Plane plane;
 	plane.initialize(&core, &psos, &shaders);
+
+	Cube cube;
+	cube.initialize(&core, &psos, &shaders);
 	
 	Timer timer;
 	float time = 0.f;
-
-	Matrix planeWorld = Matrix::identity();
 
 	while (true) {
 		core.beginFrame();
@@ -41,14 +43,15 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		time += dt;
 		Vec3 from = Vec3(11.f * cos(time), 5.f, 11.f * sinf(time));
 		Matrix v = Matrix::lookAt(from, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
-		Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection/Perspective Matrix
+		Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection (Perspective) Matrix
 		Matrix vp = p.mul(v);
 
-		shaders.updateConstantVertexShaderBuffer("Plane", "staticMeshBuffer", "W", &planeWorld);
 		shaders.updateConstantVertexShaderBuffer("Plane", "staticMeshBuffer", "VP", &vp);
+		shaders.updateConstantVertexShaderBuffer("Cube", "staticMeshBuffer", "VP", &vp);
 
 		core.beginRenderPass();
 		plane.draw(&core, &psos, &shaders);
+		cube.draw(&core, &psos, &shaders);
 		core.finishFrame();
 	}
 	core.flushGraphicsQueue();

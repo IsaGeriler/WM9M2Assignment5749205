@@ -44,6 +44,8 @@ public:
 	}
 
 	void draw(Core* core, PSOManager* psos, ShaderManager* shaders) {
+		Matrix planeWorld = Matrix::identity();
+		shaders->updateConstantVertexShaderBuffer("Plane", "staticMeshBuffer", "W", &planeWorld);
 		shaders->apply(core, shadername);
 		psos->bind(core, "PlanePSO");
 		mesh.draw(core);
