@@ -203,7 +203,7 @@ Vec4 Min(const Vec4& v1, const Vec4& v2) { return Vec4(std::min<float>(v1.v[0], 
 													   std::min<float>(v1.v[2], v2.v[2]), std::min<float>(v1.v[3], v2.v[3])); }
 
 // 4x4 Matrix Class
-class Matrix {
+class alignas(64) Matrix {
 public:
 	// Union elements can be accessed in the same memory address, unlike structs
 	union {
@@ -262,73 +262,63 @@ public:
 	// 4x4 Matrix Multiplication
 	Matrix mul(const Matrix& matrix) const {
 		Matrix ret;
-		ret.m[0] = m[0] * matrix.m[0] + m[1] * matrix.m[4] + m[2] * matrix.m[8] + m[3] * matrix.m[12];
-		ret.m[1] = m[0] * matrix.m[1] + m[1] * matrix.m[5] + m[2] * matrix.m[9] + m[3] * matrix.m[13];
-		ret.m[2] = m[0] * matrix.m[2] + m[1] * matrix.m[6] + m[2] * matrix.m[10] + m[3] * matrix.m[14];
-		ret.m[3] = m[0] * matrix.m[3] + m[1] * matrix.m[7] + m[2] * matrix.m[11] + m[3] * matrix.m[15];
-		ret.m[4] = m[4] * matrix.m[0] + m[5] * matrix.m[4] + m[6] * matrix.m[8] + m[7] * matrix.m[12];
-		ret.m[5] = m[4] * matrix.m[1] + m[5] * matrix.m[5] + m[6] * matrix.m[9] + m[7] * matrix.m[13];
-		ret.m[6] = m[4] * matrix.m[2] + m[5] * matrix.m[6] + m[6] * matrix.m[10] + m[7] * matrix.m[14];
-		ret.m[7] = m[4] * matrix.m[3] + m[5] * matrix.m[7] + m[6] * matrix.m[11] + m[7] * matrix.m[15];
-		ret.m[8] = m[8] * matrix.m[0] + m[9] * matrix.m[4] + m[10] * matrix.m[8] + m[11] * matrix.m[12];
-		ret.m[9] = m[8] * matrix.m[1] + m[9] * matrix.m[5] + m[10] * matrix.m[9] + m[11] * matrix.m[13];
-		ret.m[10] = m[8] * matrix.m[2] + m[9] * matrix.m[6] + m[10] * matrix.m[10] + m[11] * matrix.m[14];
-		ret.m[11] = m[8] * matrix.m[3] + m[9] * matrix.m[7] + m[10] * matrix.m[11] + m[11] * matrix.m[15];
-		ret.m[12] = m[12] * matrix.m[0] + m[13] * matrix.m[4] + m[14] * matrix.m[8] + m[15] * matrix.m[12];
-		ret.m[13] = m[12] * matrix.m[1] + m[13] * matrix.m[5] + m[14] * matrix.m[9] + m[15] * matrix.m[13];
-		ret.m[14] = m[12] * matrix.m[2] + m[13] * matrix.m[6] + m[14] * matrix.m[10] + m[15] * matrix.m[14];
-		ret.m[15] = m[12] * matrix.m[3] + m[13] * matrix.m[7] + m[14] * matrix.m[11] + m[15] * matrix.m[15];
+		ret.m[0] = m[0] * matrix.m[0] + m[4] * matrix.m[1] + m[8] * matrix.m[2] + m[12] * matrix.m[3];
+		ret.m[1] = m[1] * matrix.m[0] + m[5] * matrix.m[1] + m[9] * matrix.m[2] + m[13] * matrix.m[3];
+		ret.m[2] = m[2] * matrix.m[0] + m[6] * matrix.m[1] + m[10] * matrix.m[2] + m[14] * matrix.m[3];
+		ret.m[3] = m[3] * matrix.m[0] + m[7] * matrix.m[1] + m[11] * matrix.m[2] + m[15] * matrix.m[3];
+
+		ret.m[4] = m[0] * matrix.m[4] + m[4] * matrix.m[5] + m[8] * matrix.m[6] + m[12] * matrix.m[7];
+		ret.m[5] = m[1] * matrix.m[4] + m[5] * matrix.m[5] + m[9] * matrix.m[6] + m[13] * matrix.m[7];
+		ret.m[6] = m[2] * matrix.m[4] + m[6] * matrix.m[5] + m[10] * matrix.m[6] + m[14] * matrix.m[7];
+		ret.m[7] = m[3] * matrix.m[4] + m[7] * matrix.m[5] + m[11] * matrix.m[6] + m[15] * matrix.m[7];
+
+		ret.m[8] = m[0] * matrix.m[8] + m[4] * matrix.m[9] + m[8] * matrix.m[10] + m[12] * matrix.m[11];
+		ret.m[9] = m[1] * matrix.m[8] + m[5] * matrix.m[9] + m[9] * matrix.m[10] + m[13] * matrix.m[11];
+		ret.m[10] = m[2] * matrix.m[8] + m[6] * matrix.m[9] + m[10] * matrix.m[10] + m[14] * matrix.m[11];
+		ret.m[11] = m[3] * matrix.m[8] + m[7] * matrix.m[9] + m[11] * matrix.m[10] + m[15] * matrix.m[11];
+
+		ret.m[12] = m[0] * matrix.m[12] + m[4] * matrix.m[13] + m[8] * matrix.m[14] + m[12] * matrix.m[15];
+		ret.m[13] = m[1] * matrix.m[12] + m[5] * matrix.m[13] + m[9] * matrix.m[14] + m[13] * matrix.m[15];
+		ret.m[14] = m[2] * matrix.m[12] + m[6] * matrix.m[13] + m[10] * matrix.m[14] + m[14] * matrix.m[15];
+		ret.m[15] = m[3] * matrix.m[12] + m[7] * matrix.m[13] + m[11] * matrix.m[14] + m[15] * matrix.m[15];
 		return ret;
 	}
 
 	// Rotate on x-axis
 	static Matrix rotateOnXAxis(const float theta) {
 		Matrix xMat;
-		for (int i = 0; i < 16; i++) xMat[i] = 0;
-		xMat[0] = 1;
 		xMat[5] = cos(theta); xMat[6] = -sin(theta);
 		xMat[9] = sin(theta); xMat[10] = cos(theta);
-		xMat[15] = 1;
 		return xMat;
 	}
 
 	// Rotate on y-axis
 	static Matrix rotateOnYAxis(const float theta) {
 		Matrix yMat;
-		for (int i = 0; i < 16; i++) yMat[i] = 0;
 		yMat[0] = cos(theta); yMat[2] = sin(theta);
-		yMat[5] = 1;
 		yMat[8] = -sin(theta); yMat[10] = cos(theta);
-		yMat[15] = 1;
 		return yMat;
 	}
 	
 	// Rotate on z-axis
 	static Matrix rotateOnZAxis(const float theta) {
 		Matrix zMat;
-		for (int i = 0; i < 16; i++) zMat[i] = 0;
 		zMat[0] = cos(theta); zMat[1] = -sin(theta);
 		zMat[4] = sin(theta); zMat[5] = cos(theta);
-		zMat[10] = 1; zMat[15] = 1;
 		return zMat;
 	}
 
 	// Translate
 	static Matrix translate(const Vec3& v) {
 		Matrix trans;
-		for (int i = 0; i < 16; i++) trans[i] = 0;
-		trans[0] = 1; trans[3] = v.x;
-		trans[5] = 1; trans[7] = v.y;
-		trans[10] = 1; trans[11] = v.z;
-		trans[15] = 1;
+		trans[3] = v.x; trans[7] = v.y; trans[11] = v.z;
 		return trans;
 	}
 
 	// Scale
 	static Matrix scale(const Vec3& v) {
 		Matrix sc;
-		for (int i = 0; i < 16; i++) sc[i] = 0;
-		sc[0] = v.x; sc[5] = v.y; sc[10] = v.z; sc[15] = 1;
+		sc[0] = v.x; sc[5] = v.y; sc[10] = v.z;
 		return sc;
 	}
 
@@ -384,9 +374,8 @@ public:
 		
 		// Initialize Projection Matrix
 		Matrix proj;
-		for (int i = 0; i < 16; i++) proj[i] = 0;
 
-		proj[0] = 1 / (aspect * fov);
+		proj[0] = (1 / (fov)) / aspect;
 		proj[5] = 1 / fov;
 
 		// Z mapping
@@ -402,17 +391,16 @@ public:
 	// LookAt Matrix
 	static Matrix lookAt(const Vec3& from, const Vec3& to, const Vec3& up) {
 		Matrix look;
-		for (int i = 0; i < 16; i++) look[i] = 0;
 
 		// Calculate dir - to - up'
-		Vec3 dir = (to - from).normalize(); // dir = (to - from) / |to - from|
-		Vec3 right = Cross(up, dir);		// right = up x dir
-		Vec3 up1 = Cross(dir, right);		// up' = dir x right
+		Vec3 dir = (to - from).normalize();				// dir = (to - from) / |to - from|
+		Vec3 right = Cross(up, dir).normalize();		// right = up x dir
+		Vec3 up1 = Cross(dir, right);					// up' = dir x right
 
 		// Assign the matrix
-		look[0] = right.x; look[1] = right.y; look[2] = right.z; look[3] = Dot(-from, right);
-		look[4] = up1.x; look[5] = up1.y; look[6] = up1.z; look[7] = Dot(-from, up1);
-		look[8] = dir.x; look[9] = dir.y; look[10] = dir.z; look[11] = Dot(-from, dir);
+		look[0] = right.x; look[1] = right.y; look[2] = right.z; look[3] = -Dot(from, right);
+		look[4] = up1.x; look[5] = up1.y; look[6] = up1.z; look[7] = -Dot(from, up1);
+		look[8] = dir.x; look[9] = dir.y; look[10] = dir.z; look[11] = -Dot(from, dir);
 		look[12] = 0; look[13] = 0; look[14] = 0; look[15] = 1;
 
 		return look;
@@ -503,6 +491,15 @@ public:
 		return Quaternion(conj.d / mag, conj.a / mag, conj.b / mag, conj.c / mag);
 	}
 
+	Quaternion operator*(Quaternion q1) {
+		Quaternion v;
+		v.a = ((d * q1.a) + (a * q1.d) + (b * q1.c) - (c * q1.b));
+		v.b = ((d * q1.b) - (a * q1.c) + (b * q1.d) + (c * q1.a));
+		v.c = ((d * q1.c) + (a * q1.b) - (b * q1.a) + (c * q1.d));
+		v.d = ((d * q1.d) - (a * q1.a) - (b * q1.b) - (c * q1.c));
+		return v;
+	}
+
 	// Multiply
 	Quaternion multiply(const Quaternion& q2) {
 		return Quaternion((d * q2.d - a * q2.a - b * q2.b - c * q2.c),
@@ -523,10 +520,10 @@ public:
 		float bb = b * b, bc = b * c, cc = c * c;
 		float da = d * a, db = d * b, dc = d * c;
 		
-		m[0] = 1 - 2 * (bb + cc); m[1] = 2 * (ab - dc); m[2] = 2 * (ac + db); m[3] = 0;
-		m[4] = 2 * (ab + dc); m[5] = 1 - 2 * (aa + cc); m[6] = 2 * (bc - da); m[7] = 0;
-		m[8] = 2 * (ac - db); m[9] = 2 * (bc + da); m[10] = 1 - 2 * (aa + bb); m[11] = 0;
-		m[12] = m[13] = m[14] = 0; m[15] = 1;
+		m[0] = 1.f - 2.f * (bb + cc); m[1] = 2.f * (ab - dc); m[2] = 2.f * (ac + db); m[3] = 0.f;
+		m[4] = 2.f * (ab + dc); m[5] = 1.f - 2.f * (aa + cc); m[6] = 2.f * (bc - da); m[7] = 0.f;
+		m[8] = 2.f * (ac - db); m[9] = 2.f * (bc + da); m[10] = 1.f - 2.f * (aa + bb); m[11] = 0.f;
+		m[12] = 0.f; m[13] = 0.f; m[14] = 0.f; m[15] = 1.f;
 		return m;
 	}
 
@@ -559,8 +556,8 @@ static Quaternion slerp(Quaternion q1, Quaternion q2, float t) {
 	Quaternion qr;
 	float dp = q1.a * q2.a + q1.b * q2.b + q1.c * q2.c + q1.d * q2.d;
 
-	Quaternion q11 = dp < 0 ? -q1 : q1;
-	dp = dp > 0 ? dp : -dp;
+	Quaternion q11 = (dp < 0) ? -q1 : q1;
+	dp = (dp > 0) ? dp : -dp;
 
 	float theta = acosf(clamp(dp, -1.0f, 1.0f));
 	if (theta == 0) return q1;

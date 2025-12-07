@@ -42,7 +42,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	AnimatedModel trex;
 	trex.load(&core, &psos, &shaders, "Assets/TRex.gem");
-
 	AnimationInstance animatedInstance;
 	animatedInstance.initialize(&trex.animation, 0);
 	
@@ -57,14 +56,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		time += dt;
 		Vec3 from = Vec3(11.f * cos(time), 5.f, 11.f * sinf(time));
-		Matrix v = Matrix::lookAt(from, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
+		Matrix v = Matrix::lookAt(from, Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
 		Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection/Perspective Matrix
-		Matrix vp = p.mul(v);
+		Matrix vp = v * p;
 
 		Matrix planeWorld = Matrix::identity();
-		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 2.f, 0.f));
+		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f));
 		Matrix sphereWorld = Matrix::identity();
-		Matrix acaciaWorld = Matrix::scale(Vec3(0.0025f, 0.0025f, 0.0025f));
+		Matrix acaciaWorld = Matrix::scale(Vec3(0.002f, 0.002f, 0.002f));
 		Matrix trexWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
 
 		core.beginRenderPass();
@@ -72,7 +71,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		animatedInstance.update("run", dt);
 		if (animatedInstance.animationFinished() == true)
 			animatedInstance.resetAnimationTime();
-
 		shaders.updateConstantVertexShaderBuffer("AnimatedUntextured", "animatedMeshBuffer", "VP", &vp);
 		trex.draw(&core, &animatedInstance, &psos, &shaders, vp, trexWorld);
 
@@ -81,7 +79,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		sphere.draw(&core, &psos, &shaders, vp, sphereWorld);
 		acacia.draw(&core, &psos, &shaders, vp, acaciaWorld);
 
-		cubeWorld = Matrix::translate(Vec3(5.f, 2.f, 0.f));
+		cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f));
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		
 		core.finishFrame();

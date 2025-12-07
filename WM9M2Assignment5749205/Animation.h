@@ -29,8 +29,7 @@ struct AnimationFrame {
 	std::vector<Vec3> scales;
 };
 
-class AnimationSequence {
-public:
+struct AnimationSequence {
 	std::vector<AnimationFrame> frames;
 	float ticksPerSecond;
 	
@@ -65,10 +64,10 @@ public:
 		Matrix scale = Matrix::scale(interpolate(frames[baseFrame].scales[boneIndex], frames[nextFrame(baseFrame)].scales[boneIndex], interpolationFact));
 		Matrix rotation = interpolate(frames[baseFrame].rotations[boneIndex], frames[nextFrame(baseFrame)].rotations[boneIndex], interpolationFact).toMatrix();
 		Matrix translation = Matrix::translate(interpolate(frames[baseFrame].positions[boneIndex], frames[nextFrame(baseFrame)].positions[boneIndex], interpolationFact));
-		Matrix local = translation.mul(rotation).mul(scale);
+		Matrix local =  scale * rotation * translation;
 		
 		if (skeleton->bones[boneIndex].parentIndex > -1) {
-			Matrix global = matrices[skeleton->bones[boneIndex].parentIndex].mul(local);
+			Matrix global = local * matrices[skeleton->bones[boneIndex].parentIndex];
 			return global;
 		}
 		return local;
@@ -88,9 +87,9 @@ public:
 		return animations[name].interpolateBoneToGlobal(matrices, baseFrame, interpolationFact, &skeleton, boneIndex);
 	}
 
-	void calcFinalTransforms(Matrix* matrices) {
+	void calcFinalTransforms(Matrix* matrices, Matrix coordTransform) {
 		for (int i = 0; i < skeleton.bones.size(); i++)
-			matrices[i] = matrices[i] * skeleton.bones[i].offset * skeleton.globalInverse;
+			matrices[i] = skeleton.bones[i].offset * matrices[i] * skeleton.globalInverse * coordTransform;
 	}
 
 	bool hasAnimation(std::string name) {
@@ -140,7 +139,7 @@ public:
 		animation->calcFrame(name, t, frame, interpolationFact);
 		for (int i = 0; i < animation->skeleton.bones.size(); i++)
 			matrices[i] = animation->interpolateBoneToGlobal(name, matrices, frame, interpolationFact, i);
-		animation->calcFinalTransforms(matrices);
+		animation->calcFinalTransforms(matrices, coordTransform);
 	}
 
 	Matrix findWorldMatrix(std::string bonename) {
