@@ -29,7 +29,8 @@ struct AnimationFrame {
 	std::vector<Vec3> scales;
 };
 
-struct AnimationSequence {
+class AnimationSequence {
+public:
 	std::vector<AnimationFrame> frames;
 	float ticksPerSecond;
 	
@@ -64,10 +65,10 @@ struct AnimationSequence {
 		Matrix scale = Matrix::scale(interpolate(frames[baseFrame].scales[boneIndex], frames[nextFrame(baseFrame)].scales[boneIndex], interpolationFact));
 		Matrix rotation = interpolate(frames[baseFrame].rotations[boneIndex], frames[nextFrame(baseFrame)].rotations[boneIndex], interpolationFact).toMatrix();
 		Matrix translation = Matrix::translate(interpolate(frames[baseFrame].positions[boneIndex], frames[nextFrame(baseFrame)].positions[boneIndex], interpolationFact));
-		Matrix local = scale * rotation * translation;
+		Matrix local = translation.mul(rotation).mul(scale);
 		
 		if (skeleton->bones[boneIndex].parentIndex > -1) {
-			Matrix global = local * matrices[skeleton->bones[boneIndex].parentIndex];
+			Matrix global = matrices[skeleton->bones[boneIndex].parentIndex].mul(local);
 			return global;
 		}
 		return local;

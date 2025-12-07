@@ -11,7 +11,6 @@
 class StaticModel {
 public:
 	std::vector<Mesh*> meshes;
-	std::string shadername;
 
 	void load(Core* core, PSOManager* psos, ShaderManager* shaders, std::string filename) {
 		GEMLoader::GEMModelLoader loader;
@@ -29,7 +28,6 @@ public:
 			meshes.push_back(mesh);
 		}
 		shaders->loadShader(core, "StaticModelUntextured", "VertexShaderStatic.txt", "PixelShader.txt");
-		shadername = "StaticModelUntextured";
 		psos->createPSO(core, "StaticModelPSO", shaders->getShader("StaticModelUntextured")->vertexShader, shaders->getShader("StaticModelUntextured")->pixelShader, VertexLayoutCache::getStaticLayout());
 	}
 

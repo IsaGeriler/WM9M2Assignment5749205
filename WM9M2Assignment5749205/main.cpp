@@ -42,6 +42,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	AnimatedModel trex;
 	trex.load(&core, &psos, &shaders, "Assets/TRex.gem");
+
+	AnimationInstance animatedInstance;
+	animatedInstance.initialize(&trex.animation, 0);
 	
 	Timer timer;
 	float time = 0.f;
@@ -65,6 +68,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Matrix trexWorld = Matrix::scale(Vec3(0.05f, 0.05f, 0.05f));
 
 		core.beginRenderPass();
+		
+		animatedInstance.update("run", dt);
+		if (animatedInstance.animationFinished() == true)
+			animatedInstance.resetAnimationTime();
+
+		shaders.updateConstantVertexShaderBuffer("AnimatedUntextured", "animatedMeshBuffer", "VP", &vp);
+		trex.draw(&core, &animatedInstance, &psos, &shaders, vp, trexWorld);
+
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		plane.draw(&core, &psos, &shaders, vp, planeWorld);
 		sphere.draw(&core, &psos, &shaders, vp, sphereWorld);
@@ -72,9 +83,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		cubeWorld = Matrix::translate(Vec3(5.f, 2.f, 0.f));
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
-
-		trex.update(dt);
-		trex.draw(&core, &psos, &shaders, vp, trexWorld);
 		
 		core.finishFrame();
 	}

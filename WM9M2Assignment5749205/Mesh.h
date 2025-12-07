@@ -96,7 +96,7 @@ public:
 		core->uploadResource(vertexBuffer, vertices, numVertices * vertexSizeInBytes, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 		// Add Index Buffer creation on GPU memory
-		D3D12_RESOURCE_DESC ibDesc;
+		D3D12_RESOURCE_DESC ibDesc = {};
 		memset(&ibDesc, 0, sizeof(D3D12_RESOURCE_DESC));
 		ibDesc.Width = numIndices * sizeof(unsigned int);
 		ibDesc.Height = 1;

@@ -37,12 +37,12 @@ public:
 		numInstances = _maxDrawCalls;
 		offsetIndex = 0;
 		HRESULT hr;
-		D3D12_HEAP_PROPERTIES heapprops = {};
+		D3D12_HEAP_PROPERTIES heapprops;
 		memset(&heapprops, 0, sizeof(D3D12_HEAP_PROPERTIES));
 		heapprops.Type = D3D12_HEAP_TYPE_UPLOAD;
 		heapprops.CreationNodeMask = 1;
 		heapprops.VisibleNodeMask = 1;
-		D3D12_RESOURCE_DESC cbDesc = {};
+		D3D12_RESOURCE_DESC cbDesc;
 		memset(&cbDesc, 0, sizeof(D3D12_RESOURCE_DESC));
 		cbDesc.Width = cbSizeInBytesAligned;
 		cbDesc.Height = 1;
