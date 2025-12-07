@@ -64,8 +64,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Matrix planeWorld = Matrix::identity();
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 2.f, 0.f));
 		Matrix sphereWorld = Matrix::identity();
-		Matrix acaciaWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
-		Matrix trexWorld = Matrix::scale(Vec3(0.05f, 0.05f, 0.05f));
+		Matrix acaciaWorld = Matrix::scale(Vec3(0.0025f, 0.0025f, 0.0025f));
+		Matrix trexWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
 
 		core.beginRenderPass();
 		

@@ -549,20 +549,35 @@ static Type lerp(const Type a, const Type b, float t) {
 	return a * (1.f - t) + (b * t);
 }
 
+template <typename T>
+static T clamp(const T value, const T minValue, const T maxValue) {
+	return std::max<T>(std::min<T>(value, maxValue), minValue);
+}
+
 // Spherical Linear Interpolation
 static Quaternion slerp(Quaternion q1, Quaternion q2, float t) {
-	float dot = Dot(q1, q2);
+	Quaternion qr;
+	float dp = q1.a * q2.a + q1.b * q2.b + q1.c * q2.c + q1.d * q2.d;
 
-	// Check if q1.q2 < 0
-	if (dot < 0) {
-		q2 = -q2;
-		dot = -dot;
-	}
+	Quaternion q11 = dp < 0 ? -q1 : q1;
+	dp = dp > 0 ? dp : -dp;
 
-	float theta = acos(dot);
-	float s0 = (sin(theta * (1 - t))) / sin(theta);
-	float s1 = (sin(theta * t)) / sin(theta);
-	return Quaternion(q1.d * s0 + q2.d * s1, q1.a * s0 + q2.a * s1, q1.b * s0 + q2.b * s1, q1.c * s0 + q2.c * s1);
+	float theta = acosf(clamp(dp, -1.0f, 1.0f));
+	if (theta == 0) return q1;
+
+	float d = sinf(theta);
+	float a = sinf((1 - t) * theta);
+	float b = sinf(t * theta);
+	float coeff1 = a / d;
+	float coeff2 = b / d;
+
+	qr.a = coeff1 * q11.a + coeff2 * q2.a;
+	qr.b = coeff1 * q11.b + coeff2 * q2.b;
+	qr.c = coeff1 * q11.c + coeff2 * q2.c;
+	qr.d = coeff1 * q11.d + coeff2 * q2.d;
+
+	qr.normalize();
+	return qr;
 }
 
 // Colour Class

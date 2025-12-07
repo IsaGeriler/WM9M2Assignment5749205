@@ -30,6 +30,8 @@ public:
 			mesh->initialize(core, vertices, gemmeshes[i].indices);
 			meshes.push_back(mesh);
 		}
+		shaders->loadShader(core, "AnimatedUntextured", "VertexShaderAnimated.txt", "PixelShader.txt");
+		psos->createPSO(core, "AnimatedModelPSO", shaders->getShader("AnimatedUntextured")->vertexShader, shaders->getShader("AnimatedUntextured")->pixelShader, VertexLayoutCache::getAnimatedLayout());
 		memcpy(&animation.skeleton.globalInverse, &gemanimation.globalInverse, 16 * sizeof(float));
 
 		// Bones
@@ -62,8 +64,6 @@ public:
 				aseq.frames.push_back(frame);
 			}
 			animation.animations.insert({ name, aseq });
-			shaders->loadShader(core, "AnimatedUntextured", "VertexShaderAnimated.txt", "PixelShader.txt");
-			psos->createPSO(core, "AnimatedModelPSO", shaders->getShader("AnimatedUntextured")->vertexShader, shaders->getShader("AnimatedUntextured")->pixelShader, VertexLayoutCache::getAnimatedLayout());
 		}
 	}
 
