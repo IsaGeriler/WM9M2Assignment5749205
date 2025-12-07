@@ -106,6 +106,7 @@ public:
 		ibDesc.SampleDesc.Count = 1;
 		ibDesc.SampleDesc.Quality = 0;
 		ibDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		
 		hr = core->device->CreateCommittedResource(&heapprops, D3D12_HEAP_FLAG_NONE, &ibDesc, D3D12_RESOURCE_STATE_COMMON, NULL, IID_PPV_ARGS(&indexBuffer));
 		core->uploadResource(indexBuffer, indices, numIndices * sizeof(unsigned int), D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
@@ -118,6 +119,7 @@ public:
 		ibView.BufferLocation = indexBuffer->GetGPUVirtualAddress();
 		ibView.Format = DXGI_FORMAT_R32_UINT;
 		ibView.SizeInBytes = numIndices * sizeof(unsigned int);
+
 		numMeshIndices = numIndices;
 	}
 

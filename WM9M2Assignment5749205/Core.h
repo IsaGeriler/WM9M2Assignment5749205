@@ -390,9 +390,7 @@ public:
 			dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
 			dst.SubresourceIndex = 0;
 			getCommandList()->CopyTextureRegion(&dst, 0, 0, 0, &src, NULL);
-		} else {
-			getCommandList()->CopyBufferRegion(dstResource, 0, uploadBuffer, 0, size);
-		}
+		} else getCommandList()->CopyBufferRegion(dstResource, 0, uploadBuffer, 0, size);
 
 		// Transition buffer to final state after copying
 		Barrier::add(dstResource, D3D12_RESOURCE_STATE_COPY_DEST, targetState, getCommandList());
@@ -415,5 +413,7 @@ public:
 		getCommandList()->SetGraphicsRootSignature(rootSignature);
 	}
 
-	int frameIndex() { return swapchain->GetCurrentBackBufferIndex(); }
+	int frameIndex() {
+		return swapchain->GetCurrentBackBufferIndex();
+	}
 };

@@ -38,6 +38,8 @@ public:
 		shaders->updateConstantVertexShaderBuffer("StaticModelUntextured", "staticMeshBuffer", "W", &w);
 		shaders->updateConstantVertexShaderBuffer("StaticModelUntextured", "staticMeshBuffer", "VP", &vp);
 		shaders->apply(core, "StaticModelUntextured");
-		for (int i = 0; i < meshes.size(); i++) meshes[i]->draw(core);
+
+		for (int i = 0; i < meshes.size(); i++)
+			meshes[i]->draw(core);
 	}
 };

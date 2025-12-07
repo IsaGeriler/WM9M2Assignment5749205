@@ -11,6 +11,7 @@ class AnimatedModel {
 public:
 	std::vector<Mesh*> meshes;
 	Animation animation;
+	AnimationInstance animatedInstance;
 	std::string shadername;
 
 	void load(Core* core, PSOManager* psos, ShaderManager* shaders, std::string filename) {
@@ -19,6 +20,7 @@ public:
 		std::vector<GEMLoader::GEMMesh> gemmeshes;
 		GEMLoader::GEMAnimation gemanimation;
 		loader.load(filename, gemmeshes, gemanimation);
+
 		for (int i = 0; i < gemmeshes.size(); i++) {
 			Mesh* mesh = new Mesh();
 			std::vector<ANIMATED_VERTEX> vertices;
@@ -30,9 +32,6 @@ public:
 			mesh->initialize(core, vertices, gemmeshes[i].indices);
 			meshes.push_back(mesh);
 		}
-		shaders->loadShader(core, "AnimatedModelUntextured", "VertexShaderAnimated.txt", "PixelShader.txt");
-		shadername = "AnimatedModelUntextured";
-		psos->createPSO(core, "AnimatedModelPSO", shaders->getShader("AnimatedModelUntextured")->vertexShader, shaders->getShader("AnimatedModelUntextured")->pixelShader, VertexLayoutCache::getAnimatedLayout());
 		memcpy(&animation.skeleton.globalInverse, &gemanimation.globalInverse, 16 * sizeof(float));
 
 		// Bones
@@ -66,14 +65,25 @@ public:
 			}
 			animation.animations.insert({ name, aseq });
 		}
+		shaders->loadShader(core, "AnimatedModel", "VertexShaderAnimated.txt", "PixelShader.txt");
+		psos->createPSO(core, "AnimatedModelPSO", shaders->getShader("AnimatedModel")->vertexShader, shaders->getShader("AnimatedModel")->pixelShader, VertexLayoutCache::getAnimatedLayout());
+		shadername = "AnimatedModel";
+		animatedInstance.initialize(&animation, 0);
 	}
 
-	void draw(Core* core, PSOManager* psos, ShaderManager* shaders, AnimationInstance* instance, Matrix& vp, Matrix& w) {
+	void update(float dt) {
+		animatedInstance.update("run", dt);
+		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
+	}
+
+	void draw(Core* core, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
 		psos->bind(core, "AnimatedModelPSO");
-		shaders->updateConstantVertexShaderBuffer("AnimatedModelUntextured", "animatedMeshBuffer", "W", &w);
-		shaders->updateConstantVertexShaderBuffer("AnimatedModelUntextured", "animatedMeshBuffer", "VP", &vp);
-		shaders->updateConstantVertexShaderBuffer("AnimatedModelUntextured", "animatedMeshBuffer", "bones", instance->matrices);
-		shaders->apply(core, "AnimatedModelUntextured");
-		for (int i = 0; i < meshes.size(); i++) meshes[i]->draw(core);
+		shaders->updateConstantVertexShaderBuffer("AnimatedModel", "animatedMeshBuffer", "W", &w);
+		shaders->updateConstantVertexShaderBuffer("AnimatedModel", "animatedMeshBuffer", "VP", &vp);
+		shaders->updateConstantVertexShaderBuffer("AnimatedModel", "animatedMeshBuffer", "bones", animatedInstance.matrices);
+		shaders->apply(core, "AnimatedModel");
+
+		for (int i = 0; i < meshes.size(); i++)
+			meshes[i]->draw(core);
 	}
 };

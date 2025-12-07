@@ -34,8 +34,7 @@ public:
 				float phi = lon * 2.0f * M_PI / segments;
 				float sinPhi = sinf(phi);
 				float cosPhi = cosf(phi);
-				Vec3 position(radius * sinTheta * cosPhi, radius * cosTheta,
-					radius * sinTheta * sinPhi);
+				Vec3 position(radius * sinTheta * cosPhi, radius * cosTheta, radius * sinTheta * sinPhi);
 				Vec3 normal = position.normalize();
 				float tu = 1.0f - (float)lon / segments;
 				float tv = 1.0f - (float)lat / rings;

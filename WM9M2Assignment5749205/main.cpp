@@ -40,11 +40,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	StaticModel acacia;
 	acacia.load(&core, &psos, &shaders, "Assets/acacia_003.gem");
 
-	//AnimatedModel trex;
-	//trex.load(&core, &psos, &shaders, "Assets/TRex.gem");
-
-	//AnimationInstance animatedInstance;
-	//animatedInstance.initialize(&trex.animation, 0);
+	AnimatedModel trex;
+	trex.load(&core, &psos, &shaders, "Assets/TRex.gem");
 	
 	Timer timer;
 	float time = 0.f;
@@ -58,14 +55,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		time += dt;
 		Vec3 from = Vec3(11.f * cos(time), 5.f, 11.f * sinf(time));
 		Matrix v = Matrix::lookAt(from, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
-		Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection (Perspective) Matrix
+		Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection/Perspective Matrix
 		Matrix vp = p.mul(v);
 
 		Matrix planeWorld = Matrix::identity();
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 2.f, 0.f));
 		Matrix sphereWorld = Matrix::identity();
 		Matrix acaciaWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
-		//Matrix trexWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
+		Matrix trexWorld = Matrix::scale(Vec3(0.05f, 0.05f, 0.05f));
 
 		core.beginRenderPass();
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
@@ -73,12 +70,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		sphere.draw(&core, &psos, &shaders, vp, sphereWorld);
 		acacia.draw(&core, &psos, &shaders, vp, acaciaWorld);
 
-		//animatedInstance.update("run", dt);
-		//if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
-		//trex.draw(&core, &psos, &shaders, &animatedInstance, vp, trexWorld);
-		
 		cubeWorld = Matrix::translate(Vec3(5.f, 2.f, 0.f));
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
+
+		trex.update(dt);
+		trex.draw(&core, &psos, &shaders, vp, trexWorld);
+		
 		core.finishFrame();
 	}
 	core.flushGraphicsQueue();

@@ -167,15 +167,23 @@ public:
 		}
 	}
 
-	void updateConstantPixelShaderBuffer(std::string constantBufferName, std::string variableName, void* data) { updateConstantBuffer(constantBufferName, variableName, data, psConstantBuffers); }
-	void updateConstantVertexShaderBuffer(std::string constantBufferName, std::string variableName, void* data) { updateConstantBuffer(constantBufferName, variableName, data, vsConstantBuffers); }
+	void updateConstantPixelShaderBuffer(std::string constantBufferName, std::string variableName, void* data) {
+		updateConstantBuffer(constantBufferName, variableName, data, psConstantBuffers);
+	}
+	
+	void updateConstantVertexShaderBuffer(std::string constantBufferName, std::string variableName, void* data) {
+		updateConstantBuffer(constantBufferName, variableName, data, vsConstantBuffers);
+	}
 
 	void free() {
 		pixelShader->Release();
 		vertexShader->Release();
 
-		for (auto constantBuffer : psConstantBuffers) constantBuffer.free();
-		for (auto constantBuffer : vsConstantBuffers) constantBuffer.free();
+		for (auto constantBuffer : psConstantBuffers)
+			constantBuffer.free();
+
+		for (auto constantBuffer : vsConstantBuffers)
+			constantBuffer.free();
 	}
 };
 
@@ -210,14 +218,22 @@ public:
 	}
 
 	// Get Shader
-	Shader* getShader(std::string shadername) { return &shaders[shadername]; }
+	Shader* getShader(std::string shadername) {
+		return &shaders[shadername];
+	}
 
 	// Apply
-	void apply(Core* core, std::string shadername) { shaders[shadername].apply(core); }
+	void apply(Core* core, std::string shadername) {
+		shaders[shadername].apply(core);
+	}
 
 	// Update Constant PixelShader Buffer
-	void updateConstantPixelShaderBuffer(std::string shadername, std::string constantBufferName, std::string variableName, void* data) { shaders[shadername].updateConstantPixelShaderBuffer(constantBufferName, variableName, data); }
+	void updateConstantPixelShaderBuffer(std::string shadername, std::string constantBufferName, std::string variableName, void* data) {
+		shaders[shadername].updateConstantPixelShaderBuffer(constantBufferName, variableName, data);
+	}
 
 	// Update Constant VertexShader Buffer
-	void updateConstantVertexShaderBuffer(std::string shadername, std::string constantBufferName, std::string variableName, void* data) { shaders[shadername].updateConstantVertexShaderBuffer(constantBufferName, variableName, data); }
+	void updateConstantVertexShaderBuffer(std::string shadername, std::string constantBufferName, std::string variableName, void* data) {
+		shaders[shadername].updateConstantVertexShaderBuffer(constantBufferName, variableName, data);
+	}
 };

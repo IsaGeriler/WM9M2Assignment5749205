@@ -1,5 +1,6 @@
 #pragma once
 
+#include <d3d12.h>
 #include <string>
 #include <unordered_map>
 
@@ -9,7 +10,10 @@ class PSOManager {
 public:
 	std::unordered_map<std::string, ID3D12PipelineState*> psos;
 
-	~PSOManager() { for (auto& pso : psos) pso.second->Release(); }
+	~PSOManager() {
+		for (auto& pso : psos)
+			pso.second->Release();
+	}
 
 	void createPSO(Core* core, std::string name, ID3DBlob* vs, ID3DBlob* ps, D3D12_INPUT_LAYOUT_DESC layout) {
 		// Avoid creating extra state
@@ -54,7 +58,8 @@ public:
 			D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD, D3D12_LOGIC_OP_NOOP, D3D12_COLOR_WRITE_ENABLE_ALL
 		};
 
-		for (int i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; i++) blendDesc.RenderTarget[i] = defaultRenderTargetBlend;
+		for (int i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; i++)
+			blendDesc.RenderTarget[i] = defaultRenderTargetBlend;
 		desc.BlendState = blendDesc;
 
 		// Render Target State and Topology
