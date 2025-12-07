@@ -31,35 +31,12 @@ public:
 	Vec3 operator/(const float scalar) const { return Vec3(v[0] / scalar, v[1] / scalar, v[2] / scalar); }
 
 	// Vec3& Operator Overloading
-	Vec3& operator+=(const Vec3& pVec) {
-		v[0] += pVec.v[0]; v[1] += pVec.v[1]; v[2] += pVec.v[2];
-		return *this;
-	}
-
-	Vec3& operator-=(const Vec3& pVec) {
-		v[0] -= pVec.v[0]; v[1] -= pVec.v[1]; v[2] -= pVec.v[2];
-		return *this;
-	}
-
-	Vec3& operator*=(const Vec3& pVec) {
-		v[0] *= pVec.v[0]; v[1] *= pVec.v[1]; v[2] *= pVec.v[2];
-		return *this;
-	}
-
-	Vec3& operator/=(const Vec3& pVec) {
-		v[0] /= pVec.v[0]; v[1] /= pVec.v[1]; v[2] /= pVec.v[2];
-		return *this;
-	}
-
-	Vec3& operator*=(const float scalar) {
-		v[0] *= scalar; v[1] *= scalar; v[2] *= scalar;
-		return *this;
-	}
-
-	Vec3& operator/=(const float scalar) {
-		v[0] /= scalar; v[1] /= scalar; v[2] /= scalar;
-		return *this;
-	}
+	Vec3& operator+=(const Vec3& pVec) { v[0] += pVec.v[0]; v[1] += pVec.v[1]; v[2] += pVec.v[2]; return *this; }
+	Vec3& operator-=(const Vec3& pVec) { v[0] -= pVec.v[0]; v[1] -= pVec.v[1]; v[2] -= pVec.v[2]; return *this; }
+	Vec3& operator*=(const Vec3& pVec) { v[0] *= pVec.v[0]; v[1] *= pVec.v[1]; v[2] *= pVec.v[2]; return *this; }
+	Vec3& operator/=(const Vec3& pVec) { v[0] /= pVec.v[0]; v[1] /= pVec.v[1]; v[2] /= pVec.v[2]; return *this; }
+	Vec3& operator*=(const float scalar) { v[0] *= scalar; v[1] *= scalar; v[2] *= scalar; return *this; }
+	Vec3& operator/=(const float scalar) { v[0] /= scalar; v[1] /= scalar; v[2] /= scalar; return *this; }
 
 	// Unary Negate
 	Vec3 operator-() const { return Vec3(-v[0], -v[1], -v[2]); }
@@ -126,36 +103,12 @@ public:
 	Vec4 operator/(const float scalar) const { return Vec4(v[0] / scalar, v[1] / scalar, v[2] / scalar, v[3] / scalar); }
 
 	// Vec4& Operator Overloading
-	Vec4& operator+=(const Vec4& pVec) {
-		v[0] += pVec.v[0]; v[1] += pVec.v[1]; v[2] += pVec.v[2]; v[3] += pVec.v[3];
-		return *this;
-	}
-
-	Vec4& operator-=(const Vec4& pVec) {
-		v[0] -= pVec.v[0]; v[1] -= pVec.v[1]; v[2] -= pVec.v[2]; v[3] -= pVec.v[3];
-		return *this;
-	}
-
-	Vec4& operator*=(const Vec4& pVec) {
-		v[0] *= pVec.v[0]; v[1] *= pVec.v[1]; v[2] *= pVec.v[2]; v[3] *= pVec.v[3];
-		return *this;
-	}
-
-	Vec4& operator/=(const Vec4& pVec) {
-		v[0] /= pVec.v[0]; v[1] /= pVec.v[1]; v[2] /= pVec.v[2]; v[3] /= pVec.v[3];
-		return *this;
-	}
-
-	Vec4& operator*=(const float scalar) {
-		v[0] *= scalar; v[1] *= scalar; v[2] *= scalar; v[3] *= scalar;
-		return *this;
-	}
-
-	Vec4& operator/=(const float scalar) {
-		v[0] /= scalar; v[1] /= scalar; v[2] /= scalar; v[3] /= scalar;
-		return *this;
-	}
-
+	Vec4& operator+=(const Vec4& pVec) { v[0] += pVec.v[0]; v[1] += pVec.v[1]; v[2] += pVec.v[2]; v[3] += pVec.v[3]; return *this; }
+	Vec4& operator-=(const Vec4& pVec) { v[0] -= pVec.v[0]; v[1] -= pVec.v[1]; v[2] -= pVec.v[2]; v[3] -= pVec.v[3]; return *this; }
+	Vec4& operator*=(const Vec4& pVec) { v[0] *= pVec.v[0]; v[1] *= pVec.v[1]; v[2] *= pVec.v[2]; v[3] *= pVec.v[3]; return *this; }
+	Vec4& operator/=(const Vec4& pVec) { v[0] /= pVec.v[0]; v[1] /= pVec.v[1]; v[2] /= pVec.v[2]; v[3] /= pVec.v[3]; return *this; }
+	Vec4& operator*=(const float scalar) { v[0] *= scalar; v[1] *= scalar; v[2] *= scalar; v[3] *= scalar; return *this; }
+	Vec4& operator/=(const float scalar) { v[0] /= scalar; v[1] /= scalar; v[2] /= scalar; v[3] /= scalar; return *this; }
 	float& operator[](int index) { return v[index]; }
 
 	// Unary Negate
@@ -190,10 +143,7 @@ public:
 	float Min() const { return std::min<float>(std::min<float>(x, y), std::min<float>(z, w)); }
 
 	// Divide by w
-	Vec4 divideByW() {
-		float W = 1.f / v[3];
-		return Vec4(v[0] * W, v[1] * W, v[2] * W, W);
-	}
+	Vec4 divideByW() { float W = 1.f / v[3]; return Vec4(v[0] * W, v[1] * W, v[2] * W, W); }
 };
 
 float Dot(const Vec4& v1, const Vec4& v2) { return (v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2] + v1.v[3] * v2.v[3]); }
@@ -326,11 +276,11 @@ public:
 	Matrix operator* (const Matrix& matrix) { return mul(matrix); }
 
 	// Transpose
-	Matrix& transpose() {
-		for (int i = 0; i < 4; i++)
-			for (int j = i + 1; j < 4; j++)
-				std::swap(a[i][j], a[j][i]);
-		return *this;
+	Matrix transpose() {
+		return Matrix(a[0][0], a[1][0], a[2][0], a[3][0],
+					  a[0][1], a[1][1], a[2][1], a[3][1],
+					  a[0][2], a[1][2], a[2][2], a[3][2],
+					  a[0][3], a[1][3], a[2][3], a[3][3]);
 	}
 
 	// Inverse of a matrix
@@ -405,6 +355,20 @@ public:
 
 		return look;
 	}
+
+	static Matrix rotateAxis(Vec3& axis, float angle) {
+		Vec3 u = axis.normalize();
+		float c = cosf(angle);
+		float s = sinf(angle);
+		float t = 1.0f - c;
+
+		return Matrix(
+			t * u.x * u.x + c, t * u.x * u.y + s * u.z, t * u.x * u.z - s * u.y, 0,
+			t * u.x * u.y - s * u.z, t * u.y * u.y + c, t * u.y * u.z + s * u.x, 0,
+			t * u.x * u.z + s * u.y, t * u.y * u.z - s * u.x, t * u.z * u.z + c, 0,
+			0, 0, 0, 1
+		);
+	}
 };
 
 // Spherical Coordinate Class
@@ -477,7 +441,7 @@ public:
 	Quaternion normalize() {
 		float mag = sqrt(SQ(a) + SQ(b) + SQ(c) + SQ(d));
 		mag = 1.f / mag;
-		return Quaternion(d / mag, a / mag, b / mag, c / mag);
+		return Quaternion(d * mag, a * mag, b * mag, c * mag);
 	}
 
 	// Conjugate
@@ -488,7 +452,7 @@ public:
 		float mag = sqrt(SQ(a) + SQ(b) + SQ(c) + SQ(d));
 		mag = 1.f / mag;
 		Quaternion conj = conjugate();
-		return Quaternion(conj.d / mag, conj.a / mag, conj.b / mag, conj.c / mag);
+		return Quaternion(conj.d * mag, conj.a * mag, conj.b * mag, conj.c * mag);
 	}
 
 	Quaternion operator*(Quaternion q1) {

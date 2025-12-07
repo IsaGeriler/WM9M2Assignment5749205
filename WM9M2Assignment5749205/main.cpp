@@ -71,7 +71,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		animatedInstance.update("run", dt);
 		if (animatedInstance.animationFinished() == true)
 			animatedInstance.resetAnimationTime();
-		shaders.updateConstantVertexShaderBuffer("AnimatedUntextured", "animatedMeshBuffer", "VP", &vp);
 		trex.draw(&core, &animatedInstance, &psos, &shaders, vp, trexWorld);
 
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
