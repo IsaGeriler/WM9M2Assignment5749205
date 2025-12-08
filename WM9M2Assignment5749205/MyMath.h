@@ -73,8 +73,7 @@ public:
 };
 
 float Dot(const Vec3& v1, const Vec3& v2) { return (v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2]); }
-Vec3 Cross(const Vec3& v1, const Vec3& v2) { return Vec3((v1.v[1] * v2.v[2] - v1.v[2] * v2.v[1]), (v1.v[2] * v2.v[0] - v1.v[0] * v2.v[2]),
-														 (v1.v[0] * v2.v[1] - v1.v[1] * v2.v[0])); }
+Vec3 Cross(const Vec3& v1, const Vec3& v2) { return Vec3((v1.v[1] * v2.v[2] - v1.v[2] * v2.v[1]), (v1.v[2] * v2.v[0] - v1.v[0] * v2.v[2]), (v1.v[0] * v2.v[1] - v1.v[1] * v2.v[0])); }
 Vec3 Max(const Vec3& v1, const Vec3& v2) { return Vec3(std::max<float>(v1.v[0], v2.v[0]), std::max<float>(v1.v[1], v2.v[1]), std::max<float>(v1.v[2], v2.v[2])); }
 Vec3 Min(const Vec3& v1, const Vec3& v2) { return Vec3(std::min<float>(v1.v[0], v2.v[0]), std::min<float>(v1.v[1], v2.v[1]), std::min<float>(v1.v[2], v2.v[2])); }
 
@@ -147,10 +146,8 @@ public:
 };
 
 float Dot(const Vec4& v1, const Vec4& v2) { return (v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2] + v1.v[3] * v2.v[3]); }
-Vec4 Max(const Vec4& v1, const Vec4& v2) { return Vec4(std::max<float>(v1.v[0], v2.v[0]), std::max<float>(v1.v[1], v2.v[1]),
-													   std::max<float>(v1.v[2], v2.v[2]), std::max<float>(v1.v[3], v2.v[3])); }
-Vec4 Min(const Vec4& v1, const Vec4& v2) { return Vec4(std::min<float>(v1.v[0], v2.v[0]), std::min<float>(v1.v[1], v2.v[1]),
-													   std::min<float>(v1.v[2], v2.v[2]), std::min<float>(v1.v[3], v2.v[3])); }
+Vec4 Max(const Vec4& v1, const Vec4& v2) { return Vec4(std::max<float>(v1.v[0], v2.v[0]), std::max<float>(v1.v[1], v2.v[1]), std::max<float>(v1.v[2], v2.v[2]), std::max<float>(v1.v[3], v2.v[3])); }
+Vec4 Min(const Vec4& v1, const Vec4& v2) { return Vec4(std::min<float>(v1.v[0], v2.v[0]), std::min<float>(v1.v[1], v2.v[1]), std::min<float>(v1.v[2], v2.v[2]), std::min<float>(v1.v[3], v2.v[3])); }
 
 // 4x4 Matrix Class
 class alignas(64) Matrix {
@@ -493,6 +490,32 @@ public:
 
 	// Dot Product
 	float Dot(const Quaternion& q) const { return d * q.d + a * q.a + b * q.b + c * q.c; }
+
+	// Spherical Linear Interpolation
+	static Quaternion slerp(Quaternion q1, Quaternion q2, float t) {
+		Quaternion qr;
+		float dp = q1.a * q2.a + q1.b * q2.b + q1.c * q2.c + q1.d * q2.d;
+
+		Quaternion q11 = (dp < 0) ? -q1 : q1;
+		dp = (dp > 0) ? dp : -dp;
+
+		float theta = acosf(clamp(dp, -1.0f, 1.0f));
+		if (theta == 0) return q1;
+
+		float d = sinf(theta);
+		float a = sinf((1 - t) * theta);
+		float b = sinf(t * theta);
+		float coeff1 = a / d;
+		float coeff2 = b / d;
+
+		qr.a = coeff1 * q11.a + coeff2 * q2.a;
+		qr.b = coeff1 * q11.b + coeff2 * q2.b;
+		qr.c = coeff1 * q11.c + coeff2 * q2.c;
+		qr.d = coeff1 * q11.d + coeff2 * q2.d;
+
+		qr.normalize();
+		return qr;
+	}
 };
 
 float Dot(const Quaternion& q1, const Quaternion& q2) { return q1.d * q2.d + q1.a * q2.a + q1.b * q2.b + q1.c * q2.c; }
@@ -513,32 +536,6 @@ static Type lerp(const Type a, const Type b, float t) {
 template <typename T>
 static T clamp(const T value, const T minValue, const T maxValue) {
 	return std::max<T>(std::min<T>(value, maxValue), minValue);
-}
-
-// Spherical Linear Interpolation
-static Quaternion slerp(Quaternion q1, Quaternion q2, float t) {
-	Quaternion qr;
-	float dp = q1.a * q2.a + q1.b * q2.b + q1.c * q2.c + q1.d * q2.d;
-
-	Quaternion q11 = (dp < 0) ? -q1 : q1;
-	dp = (dp > 0) ? dp : -dp;
-
-	float theta = acosf(clamp(dp, -1.0f, 1.0f));
-	if (theta == 0) return q1;
-
-	float d = sinf(theta);
-	float a = sinf((1 - t) * theta);
-	float b = sinf(t * theta);
-	float coeff1 = a / d;
-	float coeff2 = b / d;
-
-	qr.a = coeff1 * q11.a + coeff2 * q2.a;
-	qr.b = coeff1 * q11.b + coeff2 * q2.b;
-	qr.c = coeff1 * q11.c + coeff2 * q2.c;
-	qr.d = coeff1 * q11.d + coeff2 * q2.d;
-
-	qr.normalize();
-	return qr;
 }
 
 // Colour Class
@@ -583,8 +580,7 @@ public:
 float edgeFunction(const Vec4& v0, const Vec4& v1, const Vec4& p) { return (((p.x - v0.x) * (v1.y - v0.y)) - ((v1.x - v0.x) * (p.y - v0.y))); }
 
 // Find Bounds
-void findBounds(int width, int height, const Vec4& v0, const Vec4& v1, const Vec4& v2, Vec4& tr, Vec4& bl)
-{
+void findBounds(int width, int height, const Vec4& v0, const Vec4& v1, const Vec4& v2, Vec4& tr, Vec4& bl) {
 	tr.x = std::min<float>(std::max<float>(std::max<float>(v0.x, v1.x), v2.x), width - 1 / 1.f);
 	tr.y = std::min<float>(std::max<float>(std::max<float>(v0.y, v1.y), v2.y), height - 1 / 1.f);
 	bl.x = std::max<float>(std::min<float>(std::min<float>(v0.x, v1.x), v2.x), 0.f);

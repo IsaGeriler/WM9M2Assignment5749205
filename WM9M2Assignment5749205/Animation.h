@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 
-#include "MyMath.h"
+#include "Maths.h"
 
 struct Bone {
 	std::string name;
@@ -38,7 +38,7 @@ struct AnimationSequence {
 	}
 	
 	Quaternion interpolate(Quaternion q1, Quaternion q2, float t) {
-		return slerp(q1, q2, t);
+		return Quaternion::slerp(q1, q2, t);
 	}
 	
 	float duration() {
@@ -61,10 +61,10 @@ struct AnimationSequence {
 	}
 
 	Matrix interpolateBoneToGlobal(Matrix* matrices, int baseFrame, float interpolationFact, Skeleton* skeleton, int boneIndex) {
-		Matrix scale = Matrix::scale(interpolate(frames[baseFrame].scales[boneIndex], frames[nextFrame(baseFrame)].scales[boneIndex], interpolationFact));
+		Matrix scale = Matrix::scaling(interpolate(frames[baseFrame].scales[boneIndex], frames[nextFrame(baseFrame)].scales[boneIndex], interpolationFact));
 		Matrix rotation = interpolate(frames[baseFrame].rotations[boneIndex], frames[nextFrame(baseFrame)].rotations[boneIndex], interpolationFact).toMatrix();
-		Matrix translation = Matrix::translate(interpolate(frames[baseFrame].positions[boneIndex], frames[nextFrame(baseFrame)].positions[boneIndex], interpolationFact));
-		Matrix local =  scale * rotation * translation;
+		Matrix translation = Matrix::translation(interpolate(frames[baseFrame].positions[boneIndex], frames[nextFrame(baseFrame)].positions[boneIndex], interpolationFact));
+		Matrix local = scale * rotation * translation;
 		
 		if (skeleton->bones[boneIndex].parentIndex > -1) {
 			Matrix global = local * matrices[skeleton->bones[boneIndex].parentIndex];

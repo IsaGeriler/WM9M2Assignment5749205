@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Core.h"
-#include "MyMath.h"
+#include "Maths.h"
 
 struct STATIC_VERTEX {
 	Vec3 pos;
@@ -71,14 +71,12 @@ public:
 	void initialize(Core* core, void* vertices, int vertexSizeInBytes, int numVertices, unsigned int* indices, int numIndices) {
 		// Specify vertex buffer will be in GPU memory heap
 		D3D12_HEAP_PROPERTIES heapprops = {};
-		memset(&heapprops, 0, sizeof(D3D12_HEAP_PROPERTIES));
 		heapprops.Type = D3D12_HEAP_TYPE_DEFAULT;
 		heapprops.CreationNodeMask = 1;
 		heapprops.VisibleNodeMask = 1;
 
 		// Create vertex buffer on heap
 		D3D12_RESOURCE_DESC vbDesc = {};
-		memset(&vbDesc, 0, sizeof(D3D12_HEAP_PROPERTIES));
 		vbDesc.Width = numVertices * vertexSizeInBytes;
 		vbDesc.Height = 1;
 		vbDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -97,7 +95,6 @@ public:
 
 		// Add Index Buffer creation on GPU memory
 		D3D12_RESOURCE_DESC ibDesc = {};
-		memset(&ibDesc, 0, sizeof(D3D12_RESOURCE_DESC));
 		ibDesc.Width = numIndices * sizeof(unsigned int);
 		ibDesc.Height = 1;
 		ibDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
