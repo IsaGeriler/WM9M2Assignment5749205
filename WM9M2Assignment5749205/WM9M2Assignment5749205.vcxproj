@@ -140,6 +140,8 @@
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="StaticModel.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

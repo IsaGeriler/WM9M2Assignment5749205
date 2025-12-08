@@ -8,6 +8,11 @@
 #include <cmath>
 #include <iostream>
 
+template <typename T>
+static T clamp(const T value, const T minValue, const T maxValue) {
+	return std::max<T>(std::min<T>(value, maxValue), minValue);
+}
+
 // Vec3 Class
 class Vec3 {
 public:
@@ -234,24 +239,24 @@ public:
 	// Rotate on x-axis
 	static Matrix rotateOnXAxis(const float theta) {
 		Matrix xMat;
-		xMat[5] = cos(theta); xMat[6] = -sin(theta);
-		xMat[9] = sin(theta); xMat[10] = cos(theta);
+		xMat[5] = cos(theta); xMat[6] = sin(theta);
+		xMat[9] = -sin(theta); xMat[10] = cos(theta);
 		return xMat;
 	}
 
 	// Rotate on y-axis
 	static Matrix rotateOnYAxis(const float theta) {
 		Matrix yMat;
-		yMat[0] = cos(theta); yMat[2] = sin(theta);
-		yMat[8] = -sin(theta); yMat[10] = cos(theta);
+		yMat[0] = cos(theta); yMat[2] = -sin(theta);
+		yMat[8] = sin(theta); yMat[10] = cos(theta);
 		return yMat;
 	}
 	
 	// Rotate on z-axis
 	static Matrix rotateOnZAxis(const float theta) {
 		Matrix zMat;
-		zMat[0] = cos(theta); zMat[1] = -sin(theta);
-		zMat[4] = sin(theta); zMat[5] = cos(theta);
+		zMat[0] = cos(theta); zMat[1] = sin(theta);
+		zMat[4] = -sin(theta); zMat[5] = cos(theta);
 		return zMat;
 	}
 
@@ -309,7 +314,7 @@ public:
 
 		det = 1.0 / det;
 		for (int i = 0; i < 16; i++)
-			inv[i] = inv[i] * det;
+			inv[i] *= det;
 		return inv;
 	}
 
@@ -321,6 +326,7 @@ public:
 		
 		// Initialize Projection Matrix
 		Matrix proj;
+		for (int i = 0; i < 16; i++) proj[i] = 0.f;
 
 		proj[0] = (1 / (fov)) / aspect;
 		proj[5] = 1 / fov;
@@ -531,11 +537,6 @@ Quaternion multiply(const Quaternion& q1, const Quaternion& q2) {
 template<typename Type>
 static Type lerp(const Type a, const Type b, float t) {
 	return a * (1.f - t) + (b * t);
-}
-
-template <typename T>
-static T clamp(const T value, const T minValue, const T maxValue) {
-	return std::max<T>(std::min<T>(value, maxValue), minValue);
 }
 
 // Colour Class

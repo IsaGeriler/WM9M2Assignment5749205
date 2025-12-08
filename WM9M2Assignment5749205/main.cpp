@@ -38,10 +38,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	sphere.initialize(&core, &psos, &shaders, 32, 32, 500.f);
 
 	StaticModel acacia;
-	acacia.load(&core, &psos, &shaders, "Assets/acacia_003.gem");
+	acacia.load(&core, &psos, &shaders, "Models/acacia_003.gem");
 
 	AnimatedModel trex;
-	trex.load(&core, &psos, &shaders, "Assets/TRex.gem");
+	trex.load(&core, &psos, &shaders, "Models/TRex.gem");
 	AnimationInstance animatedInstance;
 	animatedInstance.initialize(&trex.animation, 0);
 	
@@ -57,7 +57,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		time += dt;
 		Vec3 from = Vec3(11.f * cos(time), 5.f, 11.f * sinf(time));
 		Matrix v = Matrix::lookAt(from, Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
-		// Matrix p = Matrix::perspective(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection/Perspective Matrix
+		//Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection/Perspective Matrix
 		Matrix p = Matrix::perspective(0.01f, 10000.0f, 1920.0f / 1080.0f, 60.0f);
 		Matrix vp = v * p;
 
