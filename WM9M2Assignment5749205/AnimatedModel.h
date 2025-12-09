@@ -31,7 +31,7 @@ public:
 			}
 			textureFilenames.push_back(gemmeshes[i].material.find("albedo").getValue());
 			// Load texture with filename: gemmeshes[i].material.find("albedo").getValue()
-			textures->loadTexture(core, "albedo", gemmeshes[i].material.find("albedo").getValue());
+			textures->loadTexture(core, textureFilenames[i], gemmeshes[i].material.find("albedo").getValue());
 			mesh->initialize(core, vertices, gemmeshes[i].indices);
 			meshes.push_back(mesh);
 		}
@@ -80,7 +80,7 @@ public:
 		shaders->apply(core, "AnimatedTextured");
 
 		for (int i = 0; i < meshes.size(); i++) {
-			shaders->updateTexturePS(core, "AnimatedModel", "tex", textures->find(textureFilenames[i]));
+			shaders->updateTexturePS(core, "AnimatedTextured", "tex", textures->find(textureFilenames[i]));
 			meshes[i]->draw(core);
 		}
 	}
