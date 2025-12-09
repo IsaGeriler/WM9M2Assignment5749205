@@ -10,6 +10,7 @@
 #include "Sphere.h"
 #include "StaticModel.h"
 #include "AnimatedModel.h"
+#include "Texture.h"
 #include "Timer.h"
 #include "Window.h"
 
@@ -27,6 +28,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	PSOManager psos;
 	ShaderManager shaders;
+	TextureManager textures;
 	
 	Plane plane;
 	plane.initialize(&core, &psos, &shaders);
@@ -41,7 +43,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	acacia.load(&core, &psos, &shaders, "Models/acacia_003.gem");
 
 	AnimatedModel trex;
-	trex.load(&core, &psos, &shaders, "Models/TRex.gem");
+	trex.load(&core, &psos, &textures, &shaders, "Models/TRex.gem");
 	AnimationInstance animatedInstance;
 	animatedInstance.initialize(&trex.animation, 0);
 	
@@ -74,7 +76,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		animatedInstance.update("death", dt);
 		if (animatedInstance.animationFinished() == true)
 			animatedInstance.resetAnimationTime();
-		trex.draw(&core, &animatedInstance, &psos, &shaders, vp, trexWorld);
+		trex.draw(&core, &animatedInstance, &textures, &psos, &shaders, vp, trexWorld);
 
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		plane.draw(&core, &psos, &shaders, vp, planeWorld);

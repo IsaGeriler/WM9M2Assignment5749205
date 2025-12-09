@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "PSOManager.h"
 #include "Shaders.h"
+#include "Texture.h"
 
 class AnimatedModel {
 public:
@@ -13,7 +14,7 @@ public:
 	std::vector<std::string> textureFilenames;
 	Animation animation;
 
-	void load(Core* core, PSOManager* psos, ShaderManager* shaders, std::string filename) {
+	void load(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, std::string filename) {
 		// Load in animation data
 		GEMLoader::GEMModelLoader loader;
 		std::vector<GEMLoader::GEMMesh> gemmeshes;
@@ -30,6 +31,7 @@ public:
 			}
 			textureFilenames.push_back(gemmeshes[i].material.find("albedo").getValue());
 			// Load texture with filename: gemmeshes[i].material.find("albedo").getValue()
+			textures->loadTexture(core, "albedo", gemmeshes[i].material.find("albedo").getValue());
 			mesh->initialize(core, vertices, gemmeshes[i].indices);
 			meshes.push_back(mesh);
 		}
@@ -70,7 +72,7 @@ public:
 		}
 	}
 
-	void draw(Core* core, AnimationInstance* instance, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
+	void draw(Core* core, AnimationInstance* instance, TextureManager* textures, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
 		psos->bind(core, "AnimatedModelPSO");
 		shaders->updateConstantVertexShaderBuffer("AnimatedTextured", "animatedMeshBuffer", "W", &w);
 		shaders->updateConstantVertexShaderBuffer("AnimatedTextured", "animatedMeshBuffer", "VP", &vp);

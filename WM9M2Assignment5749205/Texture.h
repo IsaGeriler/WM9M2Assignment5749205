@@ -2,6 +2,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
+#include <map>
 #include <string>
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -16,14 +17,13 @@
 
 class Texture {
 public:
-	int width = 0, height = 0, channels = 0;
-
 	ID3D12Resource* tex;
 	int heapOffset;
 
 	DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-	void load(std::string filename) {
+	void load(Core* core, std::string filename) {
+		int width = 0, height = 0, channels = 0;
 		unsigned char* texels = stbi_load(filename.c_str(), &width, &height, &channels, 0);
 
 		if (channels == 3) {
@@ -37,15 +37,17 @@ public:
 				texelsWithAlpha[(i * 4) + 3] = 255;
 			}
 			// Initialize texture using width, height, channels, and texelsWithAlpha
+			upload(core, texelsWithAlpha, width, height, channels);
 			delete[] texelsWithAlpha;
 		}
 		else {
 			// Initialize texture using width, height, channels, and texels
+			upload(core, texels, width, height, channels);
 		}
 		stbi_image_free(texels);
 	}
 
-	void upload(Core* core) {
+	void upload(Core* core, unsigned char* data, int width, int height, int channels) {
 		D3D12_HEAP_PROPERTIES heapDesc;
 		memset(&heapDesc, 0, sizeof(D3D12_HEAP_PROPERTIES));
 		heapDesc.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -78,5 +80,32 @@ public:
 		srvDesc.Texture2D.MipLevels = 1;
 		core->device->CreateShaderResourceView(tex, &srvDesc, srvHandle);
 		heapOffset = core->srvHeap.used - 1;
+	}
+};
+
+class TextureManager {
+public:
+	std::map<std::string, Texture> textures;
+
+	~TextureManager() {
+		for (auto texture = textures.begin(); texture != textures.end();) {
+			//texture->second().free();
+			textures.erase(texture++);
+		}
+	}
+
+	// Load Texture
+	void loadTexture(Core* core, std::string texturename, std::string filename) {
+		std::map<std::string, Texture>::iterator iter = textures.find(texturename);
+		if (iter != textures.end()) return;
+
+		Texture texture;
+		texture.load(core, filename);
+		textures.insert({ texturename, texture });
+	}
+
+	// Get Texture
+	int find (std::string texturename) {
+		return textures[texturename].heapOffset;
 	}
 };
