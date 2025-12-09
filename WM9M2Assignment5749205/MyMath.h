@@ -1,16 +1,40 @@
 #pragma once
 
 #define _USE_MATH_DEFINES
-#define SQ(x) (x * x)
+
+#include <cmath>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+
+#define SQ(x)(x * x)
 #define M_PI 3.14159265358979323846
 
-#include <algorithm>
-#include <cmath>
-#include <iostream>
+// Clamping
+template <typename Type>
+static Type clamp(const Type value, const Type minValue, const Type maxValue) {
+	return std::max<Type>(std::min<Type>(value, maxValue), minValue);
+}
 
-template <typename T>
-static T clamp(const T value, const T minValue, const T maxValue) {
-	return std::max<T>(std::min<T>(value, maxValue), minValue);
+// Linear Interpolation
+template<typename Type>
+static Type lerp(const Type a, const Type b, float t) {
+	return a * (1.f - t) + (b * t);
+}
+
+// Simple Interpolate Function
+template<typename Type>
+Type simpleInterpolateAttribute(Type a0, Type a1, Type a2, float alpha, float beta, float gamma) {
+	return (a0 * alpha) + (a1 * beta) + (a2 * gamma);
+}
+
+// Perspective Correct Interpolation
+template<typename Type>
+Type perspectiveCorrectInterpolateAttribute(Type a0, Type a1, Type a2, float v0_w, float v1_w, float v2_w, float alpha, float beta, float gamma, float frag_w) {
+	Type t0 = a0 * (alpha * v0_w);
+	Type t1 = a1 * (beta * v1_w);
+	Type t2 = a2 * (gamma * v2_w);
+	return (t0 + t1 + t2) / frag_w;
 }
 
 // Vec3 Class
@@ -469,10 +493,10 @@ public:
 
 	// Multiply
 	Quaternion multiply(const Quaternion& q2) {
-		return Quaternion((d * q2.d - a * q2.a - b * q2.b - c * q2.c),
-						  (d * q2.a + a * q2.d + b * q2.c - c * q2.b),
-						  (d * q2.b - a * q2.c + b * q2.d + c * q2.a),
-						  (d * q2.c + a * q2.b - b * q2.a + c * q2.d));
+		return Quaternion(((d * q2.d) - (a * q2.a) - (b * q2.b) - (c * q2.c)),
+						  ((d * q2.a) + (a * q2.d) + (b * q2.c) - (c * q2.b)),
+						  ((d * q2.b) - (a * q2.c) + (b * q2.d) + (c * q2.a)),
+						  ((d * q2.c) + (a * q2.b) - (b * q2.a) + (c * q2.d)));
 	}
 
 	// Construct a Quaternion from axis-angle
@@ -533,12 +557,6 @@ Quaternion multiply(const Quaternion& q1, const Quaternion& q2) {
 					  (q1.d * q2.c + q1.a * q2.b - q1.b * q2.a + q1.c * q2.d));
 }
 
-// Linear Interpolation
-template<typename Type>
-static Type lerp(const Type a, const Type b, float t) {
-	return a * (1.f - t) + (b * t);
-}
-
 // Colour Class
 class Colour {
 public:
@@ -588,17 +606,32 @@ void findBounds(int width, int height, const Vec4& v0, const Vec4& v1, const Vec
 	bl.y = std::max<float>(std::min<float>(std::min<float>(v0.y, v1.y), v2.y), 0.f);
 }
 
-// Simple Interpolate Function
-template<typename Type>
-Type simpleInterpolateAttribute(Type a0, Type a1, Type a2, float alpha, float beta, float gamma) {
-	return (a0 * alpha) + (a1 * beta) + (a2 * gamma);
-}
+// Bezier Curve
+class BezierCurve {
+public:
+	std::vector<Vec3> controlPoints;
+	int factorial(int n) {
+		if (n == 0 || n == 1) return 1;
+		return n * factorial(n - 1);
+	}
 
-// Perspective Correct Interpolation
-template<typename Type>
-Type perspectiveCorrectInterpolateAttribute(Type a0, Type a1, Type a2, float v0_w, float v1_w, float v2_w, float alpha, float beta, float gamma, float frag_w) {
-	Type t0 = a0 * (alpha * v0_w);
-	Type t1 = a1 * (beta * v1_w);
-	Type t2 = a2 * (gamma * v2_w);
-	return (t0 + t1 + t2) / frag_w;
-}
+	int findBinomialCoefficient(int n, int i) {
+		return factorial(n) / (factorial(i) * factorial(n - i));
+	}
+
+	void loadControlPoints(std::vector<Vec3>& _controlPoints) {
+		controlPoints = _controlPoints;
+	}
+
+	Vec3 evaluateT(float t) {
+		int n = controlPoints.size() - 1;  // n = degree
+		Vec3 result;
+
+		for (int i = 0; i <= n; i++) {
+			int binomialCoefficient = findBinomialCoefficient(n, i);
+			float bernsteinBasis = binomialCoefficient * pow((1.f - t), (n - i)) * pow(t, i);
+			result += controlPoints[i] * bernsteinBasis;
+		}
+		return result;
+	}
+};

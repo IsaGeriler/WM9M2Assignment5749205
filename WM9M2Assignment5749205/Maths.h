@@ -540,3 +540,33 @@ Vec3 sphericalToVector(const float theta, const float phi)
 	float st = sqrtf(1.0f - (ct * ct));
 	return Vec3(sinf(phi) * st, ct, cosf(phi) * st);
 }
+
+// Bezier Curve
+class BezierCurve {
+public:
+	std::vector<Vec3> controlPoints;
+	int factorial(int n) {
+		if (n == 0 || n == 1) return 1;
+		return n * factorial(n - 1);
+	}
+
+	int findBinomialCoefficient(int n, int i) {
+		return factorial(n) / (factorial(i) * factorial(n - i));
+	}
+
+	void loadControlPoints(std::vector<Vec3>& _controlPoints) {
+		controlPoints = _controlPoints;
+	}
+
+	Vec3 evaluateT(float t) {
+		int n = controlPoints.size() - 1;  // n = degree
+		Vec3 result;
+
+		for (int i = 0; i <= n; i++) {
+			int binomialCoefficient = findBinomialCoefficient(n, i);
+			float bernsteinBasis = binomialCoefficient * pow((1.f - t), (n - i)) * pow(t, i);
+			result += controlPoints[i] * bernsteinBasis;
+		}
+		return result;
+	}
+};

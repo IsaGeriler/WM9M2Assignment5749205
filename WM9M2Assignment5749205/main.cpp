@@ -56,9 +56,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		window.processMessages();
 		if (window.keys[VK_ESCAPE] == 1) break;
 
-		time += dt;
+		time += dt;		
 		Vec3 from = Vec3(11.f * cos(time), 5.f, 11.f * sinf(time));
-		Matrix v = Matrix::lookAt(from, Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
+		Matrix v = Matrix::lookAt(from, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
 		//Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection/Perspective Matrix
 		Matrix p = Matrix::perspective(0.01f, 10000.0f, 1920.0f / 1080.0f, 60.0f);
 		Matrix vp = v * p;
