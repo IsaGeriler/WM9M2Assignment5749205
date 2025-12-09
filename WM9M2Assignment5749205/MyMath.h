@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #define _USE_MATH_DEFINES
 
@@ -76,7 +76,7 @@ public:
 	float lengthSquare() const { return SQ(v[0]) + SQ(v[1]) + SQ(v[2]); }
 
 	// Normalize a vector (i.e. unit vector)
-	Vec3 normalize() {
+	Vec3 normalize() const {
 		float len = 1.f / sqrt(SQ(v[0]) + SQ(v[1]) + SQ(v[2]));
 		return Vec3(v[0] * len, v[1] * len, v[2] * len);
 	}
@@ -190,7 +190,7 @@ public:
 	// Constructors
 	Matrix() {
 		// Initialize to identity matrix
-		for (int i = 0; i < 16; i++) (i % 5 == 0) ? m[i] = 1 : m[i] = 0;
+		for (int i = 0; i < 16; i++) (i % 5 == 0) ? m[i] = 1.f : m[i] = 0.f;
 	}
 
 	Matrix(float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8,
@@ -205,11 +205,16 @@ public:
 	// Operator Overloading
 	float& operator[](const int index) { return m[index]; }
 
+	Matrix operator=(const Matrix& matrix) {
+		memcpy(m, matrix.m, sizeof(float) * 16);
+		return (*this);
+	}
+
 	// Methods
 	// Identity Matrix
 	static Matrix identity() {
 		Matrix iden;
-		for (int i = 0; i < 16; i++) (i % 5 == 0) ? iden[i] = 1 : iden[i] = 0;
+		for (int i = 0; i < 16; i++) (i % 5 == 0) ? iden[i] = 1.f : iden[i] = 0.f;
 		return iden;
 	}
 
@@ -346,17 +351,17 @@ public:
 	static Matrix projection(int width, int height, float zFar, float zNear, float fovTheta = 90.f) {
 		// Calculate FOV (Field of View) and Aspect Ratio
 		float aspect = static_cast<float>(width) / height;
-		float fov = tan((fovTheta * (M_PI / 180.f)) / 2.f);
+		float fov = tan((fovTheta * 0.5f * M_PI / 180.f));
 		
 		// Initialize Projection Matrix
 		Matrix proj;
 		for (int i = 0; i < 16; i++) proj[i] = 0.f;
 
-		proj[0] = (1 / (fov)) / aspect;
+		proj[0] = (1 / fov) / aspect;
 		proj[5] = 1 / fov;
 
 		// Z mapping
-		proj[10] = (zFar / (zFar - zNear));
+		proj[10] = zFar / (zFar - zNear);
 		proj[11] = -(zFar * zNear) / (zFar - zNear);
 
 		// Set w component
@@ -370,15 +375,15 @@ public:
 		Matrix look;
 
 		// Calculate dir - to - up'
-		Vec3 dir = (to - from).normalize();				// dir = (to - from) / |to - from|
-		Vec3 right = Cross(up, dir).normalize();		// right = up x dir
-		Vec3 up1 = Cross(dir, right);					// up' = dir x right
+		Vec3 dir = (to - from).normalize();		  // dir = (to - from) / |to - from|
+		Vec3 right = Cross(up, dir).normalize();  // right = up x dir
+		Vec3 up1 = Cross(dir, right);			  // up' = dir x right
 
 		// Assign the matrix
 		look[0] = right.x; look[1] = right.y; look[2] = right.z; look[3] = -Dot(from, right);
 		look[4] = up1.x; look[5] = up1.y; look[6] = up1.z; look[7] = -Dot(from, up1);
 		look[8] = dir.x; look[9] = dir.y; look[10] = dir.z; look[11] = -Dot(from, dir);
-		look[12] = 0; look[13] = 0; look[14] = 0; look[15] = 1;
+		look[12] = 0.f; look[13] = 0.f; look[14] = 0.f; look[15] = 1.f;
 
 		return look;
 	}
@@ -448,17 +453,18 @@ public:
 	// Union elements can be accessed in the same memory address, unlike structs
 	union {
 		// Quaternion Form = d + ai + bj + ck
+		// However it will be described as {a, b, c, d} in the struct for simplicity
 		float q[4];
-		struct { float d, a, b, c; }; 
+		struct { float a, b, c, d; }; 
 	};
 
 	// Constructors
-	Quaternion() : d(0.f), a(0.f), b(0.f), c(0.f) {}
-	Quaternion(float _d, float _a, float _b, float _c) : d(_d), a(_a), b(_b), c(_c) {}
+	Quaternion() : a(0.f), b(0.f), c(0.f), d(0.f) {}
+	Quaternion(float _d, float _a, float _b, float _c) : a(_a), b(_b), c(_c), d(_d) {}
 
 	// Operator Overloading
 	// Unary Negate
-	Quaternion operator-() { return Quaternion(-d, -a, -b, -c); }
+	Quaternion operator-() { return Quaternion(-a, -b, -c, -d); }
 
 	// Methods
 	// Magnitude
@@ -468,18 +474,18 @@ public:
 	Quaternion normalize() {
 		float mag = sqrt(SQ(a) + SQ(b) + SQ(c) + SQ(d));
 		mag = 1.f / mag;
-		return Quaternion(d * mag, a * mag, b * mag, c * mag);
+		return Quaternion(a * mag, b * mag, c * mag, d * mag);
 	}
 
 	// Conjugate
-	Quaternion conjugate() { return Quaternion(d, -a, -b, -c); }
+	Quaternion conjugate() { return Quaternion(-a, -b, -c, d); }
 
 	// Inverse
 	Quaternion inverse() {
 		float mag = sqrt(SQ(a) + SQ(b) + SQ(c) + SQ(d));
 		mag = 1.f / mag;
 		Quaternion conj = conjugate();
-		return Quaternion(conj.d * mag, conj.a * mag, conj.b * mag, conj.c * mag);
+		return Quaternion(conj.a * mag, conj.b * mag, conj.c * mag, conj.d * mag);
 	}
 
 	Quaternion operator*(Quaternion q1) {
@@ -493,15 +499,29 @@ public:
 
 	// Multiply
 	Quaternion multiply(const Quaternion& q2) {
-		return Quaternion(((d * q2.d) - (a * q2.a) - (b * q2.b) - (c * q2.c)),
-						  ((d * q2.a) + (a * q2.d) + (b * q2.c) - (c * q2.b)),
+		return Quaternion(((d * q2.a) + (a * q2.d) + (b * q2.c) - (c * q2.b)),
 						  ((d * q2.b) - (a * q2.c) + (b * q2.d) + (c * q2.a)),
-						  ((d * q2.c) + (a * q2.b) - (b * q2.a) + (c * q2.d)));
+						  ((d * q2.c) + (a * q2.b) - (b * q2.a) + (c * q2.d)),
+						  ((d * q2.d) - (a * q2.a) - (b * q2.b) - (c * q2.c)));
 	}
 
 	// Construct a Quaternion from axis-angle
 	Quaternion fromAxisAngle(const Vec3& pVec, const float theta) {
-		return Quaternion(cos(theta / 2), pVec.x * sin(theta / 2), pVec.y * sin(theta / 2), pVec.z * sin(theta / 2));
+		return Quaternion(pVec.x * sin(theta / 2), pVec.y * sin(theta / 2), pVec.z * sin(theta / 2), cos(theta / 2));
+	}
+
+	void rotateAboutAxis(Vec3 pt, float angle, Vec3 axis) {
+		Quaternion q1, p, qinv;
+		q1.a = sinf(0.5f * angle) * axis.x;
+		q1.b = sinf(0.5f * angle) * axis.y;
+		q1.c = sinf(0.5f * angle) * axis.z;
+		q1.d = cosf(0.5f * angle);
+		p.a = pt.x; p.b = pt.y; p.c = pt.z; p.d = 0;
+		qinv = q1;
+		qinv.inverse();
+		q1 = q1 * p;
+		q1 = q1 * qinv;
+		a = q1.a; b = q1.b; c = q1.c; d = q1.d;
 	}
 
 	// Quaternion to Matrix
@@ -605,6 +625,41 @@ void findBounds(int width, int height, const Vec4& v0, const Vec4& v1, const Vec
 	bl.x = std::max<float>(std::min<float>(std::min<float>(v0.x, v1.x), v2.x), 0.f);
 	bl.y = std::max<float>(std::min<float>(std::min<float>(v0.y, v1.y), v2.y), 0.f);
 }
+
+// Frame
+class Frame {
+public:
+	Vec3 u, v, w;
+
+	void fromVector(const Vec3& n) {
+		// Gram-Schmit Orthonormalization
+		w = n.normalize();
+		float l{};
+		if (fabs(w.x) > fabs(w.y)) {
+			l = 1.f / sqrtf(SQ(w.x) + SQ(w.z));
+			u = Vec3(w.z * l, 0.f, -w.x * l);
+		}
+		else {
+			l = 1.f / sqrtf(SQ(w.y) + SQ(w.z));
+			u = Vec3(0.f, w.z * l, -w.y * l);
+		}
+		v = Cross(w, u);
+	}
+
+	void fromVectorTangent(const Vec3& n, const Vec3& t) {
+		w = n.normalize();
+		u = t.normalize();
+		v = Cross(w, u);
+	}
+
+	Vec3 toLocal(const Vec3& vec) const {
+		return Vec3(Dot(vec, u), Dot(vec, v), Dot(vec, w));
+	}
+
+	Vec3 toWorld(const Vec3& vec) const {
+		return ((u * vec.x) + (v * vec.y) + (w * vec.z));
+	}
+};
 
 // Bezier Curve
 class BezierCurve {

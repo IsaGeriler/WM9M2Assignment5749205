@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Core.h"
-#include "Maths.h"
+#include "MyMath.h"
 
 struct STATIC_VERTEX {
 	Vec3 pos;
