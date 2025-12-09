@@ -81,6 +81,10 @@ public:
 		core->device->CreateShaderResourceView(tex, &srvDesc, srvHandle);
 		heapOffset = core->srvHeap.used - 1;
 	}
+
+	void free() {
+		tex->Release();
+	}
 };
 
 class TextureManager {
@@ -89,7 +93,7 @@ public:
 
 	~TextureManager() {
 		for (auto texture = textures.begin(); texture != textures.end();) {
-			//texture->second().free();
+			texture->second.free();
 			textures.erase(texture++);
 		}
 	}
