@@ -705,25 +705,6 @@ public:
 	}
 };
 
-// Axis Alligned Bounding Box
-class AABB {
-public:
-	Vec3 max;
-	Vec3 min;
-
-	AABB() { reset(); }
-
-	void reset() {
-		max = Vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-		min = Vec3(FLT_MAX, FLT_MAX, FLT_MAX);
-	}
-
-	void extend(const Vec3& p) {
-		max = Max(max, p);
-		min = Min(min, p);
-	}
-};
-
 // Sphere
 class Sphere {
 public:
@@ -748,4 +729,35 @@ public:
 	}
 
 	Vec3 at(const float t) { return (o + (dir * t)); }
+};
+
+// Axis Alligned Bounding Box
+class AABB {
+public:
+	Vec3 max;
+	Vec3 min;
+
+	AABB() { reset(); }
+
+	void reset() {
+		max = Vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		min = Vec3(FLT_MAX, FLT_MAX, FLT_MAX);
+	}
+
+	void extend(const Vec3& p) {
+		max = Max(max, p);
+		min = Min(min, p);
+	}
+
+	// Slab Test for Ray-AABB Collision
+	bool rayAABB(const Ray& r, float& t) {
+		Vec3 s = (min - r.o) * r.invdir;
+		Vec3 l = (max - r.o) * r.invdir;
+		Vec3 s1 = Min(s, l);
+		Vec3 l1 = Max(s, l);
+		float ts = max(s1.x, max(s1.y, s1.z));
+		float tl = min(l1.x, min(l1.y, l1.z));
+		t = min(ts, tl);
+		return (ts < tl);
+	}
 };
