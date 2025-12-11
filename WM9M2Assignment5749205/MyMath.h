@@ -690,3 +690,17 @@ public:
 		return result;
 	}
 };
+
+// Gerstner Wave
+class GerstnerWave {
+public:
+	std::vector<Vec3> verticesPosition;
+
+	void loadVerticesPosition(std::vector<Vec3>& _verticesPosition) {
+		verticesPosition = _verticesPosition;
+	}
+
+	Vec3 displacementVector(int amplitute) {
+		return Vec3(0.f, 0.f, 0.f);
+	}
+};

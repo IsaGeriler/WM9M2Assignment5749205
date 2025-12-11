@@ -77,7 +77,6 @@ public:
 		used++;
 		return cpuHandle;
 	}
-
 };
 
 class Core {

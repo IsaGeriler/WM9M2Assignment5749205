@@ -29,7 +29,7 @@ public:
 		return v;
 	}
 
-	void initialize(Core* core, PSOManager* psos, ShaderManager* shaders, int rings, int segments, float radius) {
+	void initialize(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, int rings, int segments, float radius) {
 		for (int lat = 0; lat <= rings; lat++) {
 			float theta = lat * M_PI / rings;
 			float sinTheta = sinf(theta);
@@ -58,17 +58,20 @@ public:
 				indices.push_back(next + 1);
 			}
 		}
-		shaders->loadShader(core, "Sphere", "VertexShaderStatic.txt", "PixelShader.txt");
+		textures->loadTexture(core, "SkyboxTexture", "Models/Textures/citrus_orchard_road_puresky.png");
+		shaders->loadShader(core, "Sphere", "VertexShaderStatic.txt", "PixelShaderTextured.txt");
 		mesh.initialize(core, vertices, indices);
 		shadername = "Sphere";
 		psos->createPSO(core, "SpherePSO", shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getStaticLayout());
 	}
 
-	void draw(Core* core, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
+	void draw(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, Matrix& vp, Matrix& w) {
 		psos->bind(core, "SpherePSO");
 		shaders->updateConstantVertexShaderBuffer("Sphere", "staticMeshBuffer", "W", &w);
 		shaders->updateConstantVertexShaderBuffer("Sphere", "staticMeshBuffer", "VP", &vp);
 		shaders->apply(core, shadername);
+		std::cout << "Models/Textures/citrus_orchard_road_puresky.png" << ' ' << textures->find("SkyboxTexture") << '\n';
+		shaders->updateTexturePS(core, "Sphere", "tex", textures->find("SkyboxTexture"));
 		mesh.draw(core);
 	}
 };

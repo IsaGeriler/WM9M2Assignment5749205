@@ -42,7 +42,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	cube.initialize(&core, &psos, &shaders);
 
 	Sphere sphere;
-	sphere.initialize(&core, &psos, &shaders, 32, 32, 100.f);
+	sphere.initialize(&core, &psos, &textures, &shaders, 32, 32, 100.f);
 
 	StaticModel acacia;
 	acacia.load(&core, &psos, &shaders, "Models/acacia_003.gem");
@@ -80,14 +80,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		plane.draw(&core, &psos, &shaders, vp, planeWorld);
 		acacia.draw(&core, &psos, &shaders, vp, acaciaWorld);
-		sphere.draw(&core, &psos, &shaders, vp, sphereWorld);
+		sphere.draw(&core, &psos, &textures, &shaders, vp, sphereWorld);
 
 		cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f));
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		
 		animatedInstance.update("run", dt);
-		if (animatedInstance.animationFinished() == true)
-			animatedInstance.resetAnimationTime();
+		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
 		trex.draw(&core, &animatedInstance, &textures, &psos, &shaders, vp, trexWorld);
 
 		core.finishFrame();

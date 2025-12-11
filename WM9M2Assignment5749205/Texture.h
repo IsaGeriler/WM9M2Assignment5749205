@@ -22,7 +22,7 @@ public:
 
 	DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-	/*void load(Core* core, std::string filename) {
+	void loadFromFile(Core* core, std::string filename) {
 		int width = 0, height = 0, channels = 0;
 		unsigned char* texels = stbi_load(filename.c_str(), &width, &height, &channels, 0);
 
@@ -45,49 +45,9 @@ public:
 			upload(core, texels, width, height, channels);
 		}
 		stbi_image_free(texels);
-	}*/
-
-	Texture* loadFromMemory(Core* core, int width, int height, int bytesPerPixel, unsigned char* data) {
-		Texture* texture = new Texture();
-		unsigned int alignedBytes = ((width * bytesPerPixel) + 255) & ~255;
-		if ((width * bytesPerPixel) == alignedBytes)
-			texture->upload(core, data, width, height, bytesPerPixel, &core->srvHeap);
-		else {
-			unsigned char* newData = new unsigned char[(alignedBytes / sizeof(unsigned char)) * height];
-			for (int i = 0; i < height; i++)
-				memcpy(&newData[i * alignedBytes], &data[i * (width * bytesPerPixel)], width * bytesPerPixel * sizeof(unsigned char));
-			texture->upload(core, newData, width, height, bytesPerPixel, &core->srvHeap);
-			delete[] newData;
-		}
-		return texture;
 	}
 
-	Texture* loadFromFile(Core* core, std::string filename) {
-		int width = 0, height = 0, channels = 0;
-		Texture* texture = new Texture();
-		unsigned char* img = stbi_load(filename.c_str(), &width, &height, &channels, 0);
-		if (channels == 3) {
-			channels = 4;
-			unsigned char* dataAll = new unsigned char[width * height * channels];
-			for (int i = 0; i < (width * height); i++) {
-				dataAll[i * 4] = img[i * 3];
-				dataAll[(i * 4) + 1] = img[(i * 3) + 1];
-				dataAll[(i * 4) + 2] = img[(i * 3) + 2];
-				dataAll[(i * 4) + 3] = 255;
-			}
-			// This works because we are using 8bit textures, i.e. 1 byte per channel
-			texture = loadFromMemory(core, width, height, channels, dataAll);
-			delete[] dataAll;
-		}
-		else {
-			// This works because we are using 8bit textures, i.e. 1 byte per channel
-			texture = loadFromMemory(core, width, height, channels, img);
-		}
-		stbi_image_free(img);
-		return texture;
-	}
-
-	void upload(Core* core, unsigned char* data, int width, int height, int channels, DescriptorHeap* descriptorHeap) {
+	void upload(Core* core, unsigned char* data, int width, int height, int channels) {
 		D3D12_HEAP_PROPERTIES heapDesc;
 		memset(&heapDesc, 0, sizeof(D3D12_HEAP_PROPERTIES));
 		heapDesc.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -112,19 +72,19 @@ public:
 		unsigned int alignedWidth = ((width * channels) + 255) & ~255;
 		core->uploadResource(tex, data, alignedWidth * height, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &footprint);
 
-		D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = descriptorHeap->getNextCPUHandle();
+		D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = core->srvHeap.getNextCPUHandle();
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		srvDesc.Format = format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
 		core->device->CreateShaderResourceView(tex, &srvDesc, srvHandle);
-		heapOffset = descriptorHeap->used - 1;
+		heapOffset = core->srvHeap.used - 1;
 	}
 
-	/*void free() {
+	void free() {
 		tex->Release();
-	}*/
+	}
 };
 
 class TextureManager {
@@ -133,7 +93,7 @@ public:
 
 	~TextureManager() {
 		for (auto texture = textures.begin(); texture != textures.end();) {
-			//texture->second.free();
+			texture->second.free();
 			textures.erase(texture++);
 		}
 	}
