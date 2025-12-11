@@ -706,7 +706,7 @@ public:
 };
 
 // Sphere
-class Sphere {
+class BoundingSphere {
 public:
 	Vec3 centre;
 	float radius;
