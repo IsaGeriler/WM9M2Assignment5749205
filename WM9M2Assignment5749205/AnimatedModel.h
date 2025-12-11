@@ -80,6 +80,7 @@ public:
 		shaders->apply(core, "AnimatedTextured");
 
 		for (int i = 0; i < meshes.size(); i++) {
+			std::cout << textureFilenames[i] << '\n';
 			shaders->updateTexturePS(core, "AnimatedTextured", "tex", textures->find(textureFilenames[i]));
 			meshes[i]->draw(core);
 		}

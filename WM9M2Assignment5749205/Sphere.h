@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "PSOManager.h"
 #include "Shaders.h"
+#include "Texture.h"
 
 class Sphere {
 public:
@@ -17,9 +18,12 @@ public:
 
 	STATIC_VERTEX addVertex(Vec3 p, Vec3 n, float tu, float tv) {
 		STATIC_VERTEX v;
+		Frame frame;
+		frame.fromVector(n);
+
 		v.pos = p;
 		v.normal = n;
-		v.tangent = Vec3(0.f, 0.f, 0.f); // For now
+		v.tangent = frame.u;
 		v.tu = tu;
 		v.tv = tv;
 		return v;
@@ -54,8 +58,8 @@ public:
 				indices.push_back(next + 1);
 			}
 		}
-		mesh.initialize(core, vertices, indices);
 		shaders->loadShader(core, "Sphere", "VertexShaderStatic.txt", "PixelShader.txt");
+		mesh.initialize(core, vertices, indices);
 		shadername = "Sphere";
 		psos->createPSO(core, "SpherePSO", shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getStaticLayout());
 	}

@@ -17,9 +17,12 @@ public:
 
 	STATIC_VERTEX addVertex(Vec3 p, Vec3 n, float tu, float tv) {
 		STATIC_VERTEX v;
+		Frame frame;
+		frame.fromVector(n);
+
 		v.pos = p;
 		v.normal = n;
-		v.tangent = Vec3(0.f, 0.f, 0.f); // For now
+		v.tangent = frame.u;
 		v.tu = tu;
 		v.tv = tv;
 		return v;
