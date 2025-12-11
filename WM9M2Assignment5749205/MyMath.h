@@ -704,3 +704,48 @@ public:
 		return Vec3(0.f, 0.f, 0.f);
 	}
 };
+
+// Axis Alligned Bounding Box
+class AABB {
+public:
+	Vec3 max;
+	Vec3 min;
+
+	AABB() { reset(); }
+
+	void reset() {
+		max = Vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		min = Vec3(FLT_MAX, FLT_MAX, FLT_MAX);
+	}
+
+	void extend(const Vec3& p) {
+		max = Max(max, p);
+		min = Min(min, p);
+	}
+};
+
+// Sphere
+class Sphere {
+public:
+	Vec3 centre;
+	float radius;
+};
+
+// Ray
+class Ray {
+public:
+	Vec3 o;
+	Vec3 dir;
+	Vec3 invdir;
+
+	Ray() {}
+	Ray(const Vec3 _o, const Vec3 _dir) { initialize(_o, _dir); }
+	
+	void initialize(const Vec3 _o, const Vec3 _dir) {
+		o = _o;
+		dir = _dir;
+		invdir = Vec3(1.0f, 1.0f, 1.0f) / dir;
+	}
+
+	Vec3 at(const float t) { return (o + (dir * t)); }
+};
