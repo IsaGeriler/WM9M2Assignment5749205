@@ -65,7 +65,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Vec3 from = Vec3(11.f * cos(time), 5.f, 11.f * sinf(time));
 		Matrix v = Matrix::lookAt(from, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
 		Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection/Perspective Matrix
-		//Matrix p = Matrix::perspective(0.01f, 10000.0f, 1920.0f / 1080.0f, 60.0f);
 		Matrix vp = v * p;
 
 		Matrix planeWorld;
@@ -78,18 +77,19 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		core.beginRenderPass();
 		
-		animatedInstance.update("death", dt);
+		animatedInstance.update("run", dt);
 		if (animatedInstance.animationFinished() == true)
 			animatedInstance.resetAnimationTime();
 		trex.draw(&core, &animatedInstance, &textures, &psos, &shaders, vp, trexWorld);
 
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		plane.draw(&core, &psos, &shaders, vp, planeWorld);
-		sphere.draw(&core, &psos, &shaders, vp, sphereWorld);
 		acacia.draw(&core, &psos, &shaders, vp, acaciaWorld);
 
 		cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f));
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
+
+		sphere.draw(&core, &psos, &shaders, vp, sphereWorld);
 		
 		core.finishFrame();
 	}
