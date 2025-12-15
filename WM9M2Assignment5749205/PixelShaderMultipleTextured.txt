@@ -1,6 +1,5 @@
 Texture2D albedoTexture : register(t0);
 Texture2D normalsTexture : register(t1);
-Texture2D roughnessTexture : register(t2);
 SamplerState samplerLinear : register(s0);
 
 struct PS_INPUT {
@@ -36,7 +35,7 @@ float4 PS(PS_INPUT input) : SV_Target0 {
 	float2 currentTexCoords = input.TexCoords;
 	float currentHeight = 0;
 	for (int i = 0; i < numSteps; i++) {
-		float sampledHeight = roughnessTexture.Sample(samplerLinear, currentTexCoords).r;
+		float sampledHeight = normalsTexture.Sample(samplerLinear, currentTexCoords).a;
 		if (sampledHeight > currentHeight) break;
 		currentTexCoords -= scaledViewDir.xy * stepSize;
 		currentHeight += stepSize;

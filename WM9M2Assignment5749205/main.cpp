@@ -1,5 +1,5 @@
-#define WIDTH 1920
-#define HEIGHT 1200
+#define WIDTH 2560   // Dell XPS - 1920 || HP Omen Max 16 - 2560
+#define HEIGHT 1600  // Dell XPS - 1200 || HP Omen Max 16 - 1600
 
 #include "Core.h"
 #include "Cube.h"
@@ -47,6 +47,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	StaticModel acacia;
 	acacia.load(&core, &psos, &textures, &shaders, "Models/banana2_LOD5.gem");
 
+	StaticModel foodWarmer;
+	foodWarmer.load(&core, &psos, &textures, &shaders, "Models/Food_Warmer_07a.gem");
+
 	AnimatedModel trex;
 	trex.load(&core, &psos, &textures, &shaders, "Models/TRex.gem");
 	AnimationInstance animatedInstance;
@@ -63,17 +66,15 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		time += dt;		
 		Vec3 from = Vec3(11.f * cos(time), 5.f, 11.f * sinf(time));
-		// Vec3 from = Vec3(0.f, 0.f, -5.f);
 		Matrix v = Matrix::lookAt(from, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
-		Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection/Perspective Matrix
+		Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection (Perspective) Matrix
 		Matrix vp = v * p;
 
-		Matrix planeWorld;
-		planeWorld.identity();
+		Matrix planeWorld = Matrix::identity();
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f));
-		Matrix sphereWorld;
-		sphereWorld.identity();
-		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f));
+		Matrix sphereWorld = Matrix::identity();
+		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::translate(Vec3(-5.f, 1.f, 0.f));
+		Matrix foodWarmerWorld = Matrix::scale(Vec3(2.f, 2.f, 2.f)) * Matrix::translate(Vec3(0.f, 0.f, 3.f));
 		Matrix trexWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
 
 		core.beginRenderPass();
@@ -81,7 +82,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		plane.draw(&core, &psos, &shaders, vp, planeWorld);
 		acacia.draw(&core, &psos, &textures, &shaders, vp, acaciaWorld);
-		sphere.draw(&core, &psos, &textures, &shaders, vp, sphereWorld);
+		foodWarmer.draw(&core, &psos, &textures, &shaders, vp, foodWarmerWorld);
 
 		cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f));
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
@@ -89,6 +90,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		animatedInstance.update("run", dt);
 		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
 		trex.draw(&core, &animatedInstance, &textures, &psos, &shaders, vp, trexWorld);
+		sphere.draw(&core, &psos, &textures, &shaders, vp, sphereWorld);
 
 		core.finishFrame();
 	}
