@@ -10,9 +10,9 @@
 
 class AnimatedModel {
 public:
-	std::vector<Mesh*> meshes;
-	std::vector<std::string> textureFilenames;
 	Animation animation;
+	std::vector<Mesh*> meshes;
+	std::vector<std::string> albedoFilenames;
 
 	void load(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, std::string filename) {
 		// Load in animation data
@@ -29,9 +29,10 @@ public:
 				memcpy(&v, &gemmeshes[i].verticesAnimated[j], sizeof(ANIMATED_VERTEX));
 				vertices.push_back(v);
 			}
-			textureFilenames.push_back(gemmeshes[i].material.find("albedo").getValue());
 			// Load texture with filename: gemmeshes[i].material.find("albedo").getValue()
-			textures->loadTexture(core, textureFilenames[i], gemmeshes[i].material.find("albedo").getValue());
+			albedoFilenames.push_back(gemmeshes[i].material.find("albedo").getValue());
+			textures->loadTexture(core, albedoFilenames[i], gemmeshes[i].material.find("albedo").getValue());
+
 			mesh->initialize(core, vertices, gemmeshes[i].indices);
 			meshes.push_back(mesh);
 		}
@@ -80,8 +81,8 @@ public:
 		shaders->apply(core, "AnimatedTextured");
 
 		for (int i = 0; i < meshes.size(); i++) {
-			std::cout << textureFilenames[i] << ' ' << textures->find(textureFilenames[i]) << '\n';
-			shaders->updateTexturePS(core, "AnimatedTextured", "tex", textures->find(textureFilenames[i]));
+			std::cout << albedoFilenames[i] << ' ' << textures->find(albedoFilenames[i]) << '\n';
+			shaders->updateTexturePS(core, "AnimatedTextured", "tex", textures->find(albedoFilenames[i]));
 			meshes[i]->draw(core);
 		}
 	}

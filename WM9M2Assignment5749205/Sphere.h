@@ -66,11 +66,11 @@ public:
 	}
 
 	void draw(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, Matrix& vp, Matrix& w) {
+		std::cout << "Models/Textures/citrus_orchard_road_puresky.png" << ' ' << textures->find("SkyboxTexture") << '\n';
 		psos->bind(core, "SpherePSO");
 		shaders->updateConstantVertexShaderBuffer("Sphere", "staticMeshBuffer", "W", &w);
 		shaders->updateConstantVertexShaderBuffer("Sphere", "staticMeshBuffer", "VP", &vp);
 		shaders->apply(core, shadername);
-		std::cout << "Models/Textures/citrus_orchard_road_puresky.png" << ' ' << textures->find("SkyboxTexture") << '\n';
 		shaders->updateTexturePS(core, "Sphere", "tex", textures->find("SkyboxTexture"));
 		mesh.draw(core);
 	}

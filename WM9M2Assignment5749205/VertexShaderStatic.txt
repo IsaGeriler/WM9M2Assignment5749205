@@ -8,6 +8,7 @@ struct VS_INPUT {
 	float3 Normal : NORMAL;
 	float3 Tangent : TANGENT;
 	float2 TexCoords : TEXCOORD;
+	// float4x4 World : WORLD;
 };
 
 struct PS_INPUT {
