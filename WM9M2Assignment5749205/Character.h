@@ -5,6 +5,7 @@
 #include "AnimatedModel.h"
 #include "Core.h"
 #include "MyMath.h"
+#include "Window.h"
 
 // Animated Carbine
 enum State {
@@ -58,17 +59,29 @@ private:
 	AnimationInstance animationInstance;
 	State state;
 
-	// Bullet in clip
-	// Total magazine/ammo count
-	// Health
+	int bulletsInClip;
+	int totalAmmo;
+	int health;
+
+	float movementSpeed;
+	float sprintSpeed;
+	float positionX;
+	float positionY;
 public:
 	AnimatedModel animatedModel;
 
 	void initialize(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, std::string filename) {
 		animatedModel.load(core, psos, textures, shaders, filename);
-		animationInstance.animation = &animatedModel.animation;
+		animationInstance.initialize(&animatedModel.animation, 0);
 		state = Pose;
 	}
 
 	// Make function for idle, walk, sprint, shoot (and their zoomed ver. i.e. hold right click)
+	void setAnmationState(State _state) { state = _state; }
+	void updateAnimation(float dt) { animationInstance.update(getAnimationByState(state), dt); }
+	void resetAnimationTime() { if (animationInstance.animationFinished() == true) animationInstance.resetAnimationTime(); }
+
+	void draw(Core* core, TextureManager* textures, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
+		animatedModel.draw(core, &animationInstance, textures, psos, shaders, vp, w);
+	}
 };

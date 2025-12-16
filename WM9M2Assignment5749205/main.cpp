@@ -2,6 +2,7 @@
 #define HEIGHT 1600  // Dell XPS - 1200 || HP Omen Max 16 - 1600
 
 #include "Core.h"
+#include "Character.h"
 #include "Cube.h"
 #include "Mesh.h"
 #include "Plane.h"
@@ -54,6 +55,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	trex.load(&core, &psos, &textures, &shaders, "Models/TRex.gem");
 	AnimationInstance animatedInstance;
 	animatedInstance.initialize(&trex.animation, 0);
+
+	Character character;
+	character.initialize(&core, &psos, &textures, &shaders, "Models/AutomaticCarbine.gem");
 	
 	Timer timer;
 	float time = 0.f;
@@ -67,7 +71,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		time += dt;		
 		Vec3 from = Vec3(11.f * cos(time), 5.f, 11.f * sinf(time));
 		Matrix v = Matrix::lookAt(from, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
-		Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01, 60.f);  // Projection (Perspective) Matrix
+		Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01f, 60.f);  // Projection (Perspective) Matrix
 		Matrix vp = v * p;
 
 		Matrix planeWorld = Matrix::identity();
@@ -76,6 +80,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::translate(Vec3(-5.f, 1.f, 0.f));
 		Matrix foodWarmerWorld = Matrix::scale(Vec3(2.f, 2.f, 2.f)) * Matrix::translate(Vec3(0.f, 0.f, 3.f));
 		Matrix trexWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
+		Matrix characterWorld = Matrix::scale(Vec3(0.25f, 0.25f, 0.25f)) * Matrix::translate(Vec3(5.f, 0.f, 5.f));
 
 		core.beginRenderPass();
 
@@ -90,6 +95,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		animatedInstance.update("run", dt);
 		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
 		trex.draw(&core, &animatedInstance, &textures, &psos, &shaders, vp, trexWorld);
+
+		character.setAnmationState(Run);
+		character.updateAnimation(dt);
+		character.resetAnimationTime();
+		character.draw(&core, &textures, &psos, &shaders, vp, characterWorld);
+
 		sphere.draw(&core, &psos, &textures, &shaders, vp, sphereWorld);
 
 		core.finishFrame();
