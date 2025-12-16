@@ -2,12 +2,10 @@
 
 #include "MyMath.h"
 
-// For FPS use inverted lookAt & translate/scale etc.
 class Camera {
 public:
 	// Camera Attributes (Transform from world to camera)
-	Vec3 position = Vec3(0.f, 0.f, 0.f);
-	Vec3 from = Vec3(1.f, 0.f, 0.f);  // Given a position (eye/right)
+	Vec3 from = Vec3(1.f, 0.f, 0.f);  // Given a position (eye)
 	Vec3 to = Vec3(0.f, 0.f, 1.f);	  // Target Point (look)
 	Vec3 up = Vec3(0.f, 1.f, 0.f);    // Up Vector (up)
 
@@ -20,7 +18,7 @@ public:
 	Matrix projection = Matrix::identity();
 
 	// Update View Matrix
-	void updateViewMatrix() { view = Matrix::lookAt(position, to, up); }
+	void updateViewMatrix() { view = Matrix::lookAt(from, to, up); }
 
 	// Set Camera Lense
 	void setLense(int _width, int _height, float _zFar, float _zNear, float _fovTheta = 90.f) {
@@ -40,23 +38,34 @@ public:
 	float getFarWindowWidth() const { return aspectRatio * windowHeightFar; }
 
 	// W and S key movements (walk forward/backward)
-	void walk(float d) { position += to * d; }
+	void walk(float d) {
+		Vec3 dir = (to - from).normalize();
+		from += dir * d;
+		to += dir * d;
+	}
 
 	// A and D key movements (strafe left/right)
-	void strafe(float d) { position += from * d; }
+	void strafe(float d) {
+		Vec3 dir = (to - from).normalize();
+		Vec3 right = Cross(up, dir).normalize();
+		from += right * d;
+		to += right * d;
+	}
 
 	// Rotete up and to vector about the from vector
-	void pitch(float angle) {
-		Matrix R = Matrix::rotateAxis(from, angle);
-		up = R.mulVec(up).normalize();
-		to = R.mulVec(to).normalize();
-	}
+	//void pitch(float angle) {
+	//	Vec3 dir = (to - from).normalize();
+	//	Vec3 right = Cross(up, dir).normalize();
+	//	Matrix R = Matrix::rotateAxis(right, angle);
+	//	up = R.mulVec(up).normalize();
+	//	to = R.mulVec(to).normalize();
+	//}
 
-	// Rotate the basis vectors about world y-axis
-	void rotateY(float angle) {
-		Matrix R = Matrix::rotateOnYAxis(angle);
-		from = R.mulVec(up).normalize();
-		up = R.mulVec(up).normalize();
-		to = R.mulVec(to).normalize();
-	}
+	//// Rotate the basis vectors about world y-axis
+	//void rotateY(float angle) {
+	//	Matrix R = Matrix::rotateOnYAxis(angle);
+	//	from = R.mulVec(from).normalize();
+	//	up = R.mulVec(up).normalize();
+	//	to = R.mulVec(to).normalize();
+	//}
 };

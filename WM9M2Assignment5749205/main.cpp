@@ -78,10 +78,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		if (window.keys['A'] == 1) camera.strafe(-10.f * dt);
 		if (window.keys['D'] == 1) camera.strafe(10.f * dt);
 
-		if (window.keys[VK_UP]) camera.pitch(1.f * dt);
-		if (window.keys[VK_LEFT]) camera.rotateY(-1.f * dt);
-		if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
-		if (window.keys[VK_RIGHT]) camera.rotateY(1.f * dt);
+		//if (window.keys[VK_UP]) camera.pitch(1.f * dt);
+		//if (window.keys[VK_LEFT]) camera.rotateY(-1.f * dt);
+		//if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
+		//if (window.keys[VK_RIGHT]) camera.rotateY(1.f * dt);
 
 		camera.updateViewMatrix();
 
