@@ -3,31 +3,18 @@
 #include <string>
 
 #include "AnimatedModel.h"
+#include "Camera.h"
 #include "Core.h"
 #include "MyMath.h"
 #include "Window.h"
 
 // Animated Carbine
 enum State {
-	Pose,
-	Select,
-	Putaway,
-	EmptySelect,
-	Idle,
-	Inspect,
-	Walk,
-	Run,
-	Fire,
-	AlternateFire,
-	MeleeAttack,
-	ZoomIdle,
-	ZoomWalk,
-	ZoomFire,
-	ZoomAlternateFire,
-	AlternateFireModeOn,
-	DryFire,
-	Reload,
-	EmptyReload
+	Pose, Select, Putaway, EmptySelect, Idle,
+	Inspect, Walk, Run, Fire, AlternateFire,
+	MeleeAttack, ZoomIdle, ZoomWalk, ZoomFire,
+	ZoomAlternateFire, AlternateFireModeOn,
+	DryFire, Reload, EmptyReload
 };
 
 std::string getAnimationByState(State state) {
@@ -63,8 +50,8 @@ private:
 	int totalAmmo;
 	int health;
 
-	float movementSpeed;
-	float sprintSpeed;
+	float movementSpeed = 5.f;
+	float sprintSpeed = 10.f;
 	float positionX;
 	float positionY;
 public:
@@ -76,7 +63,6 @@ public:
 		state = Pose;
 	}
 
-	// Make function for idle, walk, sprint, shoot (and their zoomed ver. i.e. hold right click)
 	void setAnmationState(State _state) { state = _state; }
 	void updateAnimation(float dt) { animationInstance.update(getAnimationByState(state), dt); }
 	void resetAnimationTime() { if (animationInstance.animationFinished() == true) animationInstance.resetAnimationTime(); }
@@ -84,4 +70,36 @@ public:
 	void draw(Core* core, TextureManager* textures, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
 		animatedModel.draw(core, &animationInstance, textures, psos, shaders, vp, w);
 	}
+
+	void movePlayer(Camera* camera, Window* window, float dt) {
+		float speed = (window->keys[VK_SHIFT] == 1) ? sprintSpeed : movementSpeed;
+		State animState = (window->keys[VK_SHIFT] == 1) ? Run : Walk;
+
+		// Camera and Player Movement via Keyboard
+		if (window->keys['W'] == 1) {
+			camera->walk(speed * dt);
+			positionY += speed * dt;
+		}
+
+		if (window->keys['S'] == 1) {
+			camera->walk(-speed * dt);
+			positionY -= speed * dt;
+		}
+
+		if (window->keys['A'] == 1) {
+			camera->strafe(-speed * dt);
+			positionX -= speed * dt;
+		}
+
+		if (window->keys['D'] == 1) {
+			camera->strafe(speed * dt);
+			positionX += speed * dt;
+		}
+
+		updateAnimation(dt);
+		resetAnimationTime();
+		camera->updateViewMatrix();
+	}
+
+	// Make functions for idle and shoot (and their zoomed ver. i.e. hold right click)...
 };

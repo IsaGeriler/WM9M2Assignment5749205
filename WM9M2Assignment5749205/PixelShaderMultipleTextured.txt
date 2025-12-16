@@ -61,5 +61,5 @@ float4 PS(PS_INPUT input) : SV_Target0 {
 	// Compute lighting with new normal
 	float3 lightColour = float3(1.0, 1.0, 1.0);
 	float3 diffuse = (colour.rgb / PI) * lightColour * max(dot(mapNormal.rgb, localLightDir), 0.0);
-	return float4(diffuse, 1.0);
+	return float4(diffuse, colour.a);
 }

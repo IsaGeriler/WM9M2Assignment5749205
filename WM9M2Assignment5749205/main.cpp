@@ -72,23 +72,18 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		window.processMessages();
 		if (window.keys[VK_ESCAPE] == 1) break;
 
-		// Controlling the camera with keyboard (mouse support soon...)
-		if (window.keys['W'] == 1) camera.walk(10.f * dt);
-		if (window.keys['S'] == 1) camera.walk(-10.f * dt);
-		if (window.keys['A'] == 1) camera.strafe(-10.f * dt);
-		if (window.keys['D'] == 1) camera.strafe(10.f * dt);
-
-		//if (window.keys[VK_UP]) camera.pitch(1.f * dt);
-		//if (window.keys[VK_LEFT]) camera.rotateY(-1.f * dt);
-		//if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
-		//if (window.keys[VK_RIGHT]) camera.rotateY(1.f * dt);
-
-		camera.updateViewMatrix();
-
 		time += dt;
 		Matrix v = camera.view;
 		Matrix p = camera.projection;
 		Matrix vp = v * p;
+
+		character.movePlayer(&camera, &window, dt);
+
+		// TO:DO - Camera Control via Mouse
+		//if (window.keys[VK_UP]) camera.pitch(1.f * dt);
+		//if (window.keys[VK_LEFT]) camera.rotateY(-1.f * dt);
+		//if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
+		//if (window.keys[VK_RIGHT]) camera.rotateY(1.f * dt);
 
 		Matrix planeWorld = Matrix::identity();
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f));
@@ -111,12 +106,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		animatedInstance.update("run", dt);
 		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
 		trex.draw(&core, &animatedInstance, &textures, &psos, &shaders, vp, trexWorld);
-
-		character.setAnmationState(Run);
-		character.updateAnimation(dt);
-		character.resetAnimationTime();
+		
 		character.draw(&core, &textures, &psos, &shaders, vp, characterWorld);
-
 		sphere.draw(&core, &psos, &textures, &shaders, vp, sphereWorld);
 
 		core.finishFrame();
