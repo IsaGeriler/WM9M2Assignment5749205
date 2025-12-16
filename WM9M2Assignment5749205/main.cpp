@@ -79,11 +79,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		character.movePlayer(&camera, &window, dt);
 
-		// TO:DO - Camera Control via Mouse
-		//if (window.keys[VK_UP]) camera.pitch(1.f * dt);
-		//if (window.keys[VK_LEFT]) camera.rotateY(-1.f * dt);
-		//if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
-		//if (window.keys[VK_RIGHT]) camera.rotateY(1.f * dt);
+		// TO:DO - Camera Control via Mouse (Arrow Keys for now)
+		if (window.keys[VK_UP]) camera.pitch(2.f * dt);
+		if (window.keys[VK_LEFT]) camera.rotateY(-2.f * dt);
+		if (window.keys[VK_DOWN]) camera.pitch(-2.f * dt);
+		if (window.keys[VK_RIGHT]) camera.rotateY(2.f * dt);
 
 		Matrix planeWorld = Matrix::identity();
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f));
@@ -91,7 +91,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::translate(Vec3(-5.f, 1.f, 0.f));
 		Matrix foodWarmerWorld = Matrix::scale(Vec3(2.f, 2.f, 2.f)) * Matrix::translate(Vec3(0.f, 0.f, 3.f));
 		Matrix trexWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
-		Matrix characterWorld = Matrix::scale(Vec3(0.25f, 0.25f, 0.25f)) * Matrix::translate(Vec3(5.f, 0.f, 5.f));
+		Matrix characterWorld = Matrix::scale(Vec3(0.3f, 0.3f, 0.3f)) * Matrix::rotateOnYAxis(M_PI) * Matrix::translate(Vec3(0.f, 1.f, 0.f)) * camera.view.invert();
 
 		core.beginRenderPass();
 

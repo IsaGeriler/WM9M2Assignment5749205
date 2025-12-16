@@ -53,19 +53,19 @@ public:
 	}
 
 	// Rotete up and to vector about the from vector
-	//void pitch(float angle) {
-	//	Vec3 dir = (to - from).normalize();
-	//	Vec3 right = Cross(up, dir).normalize();
-	//	Matrix R = Matrix::rotateAxis(right, angle);
-	//	up = R.mulVec(up).normalize();
-	//	to = R.mulVec(to).normalize();
-	//}
+	void pitch(float angle) {
+		Vec3 dir = (to - from).normalize();
+		Vec3 right = Cross(up, dir).normalize();
+		Matrix R = Matrix::rotateAxis(right, angle);
+		up = R.mulVec(up).normalize();
+		to = R.mulVec(to).normalize();
+	}
 
 	//// Rotate the basis vectors about world y-axis
-	//void rotateY(float angle) {
-	//	Matrix R = Matrix::rotateOnYAxis(angle);
-	//	from = R.mulVec(from).normalize();
-	//	up = R.mulVec(up).normalize();
-	//	to = R.mulVec(to).normalize();
-	//}
+	void rotateY(float angle) {
+		Matrix R = Matrix::rotateOnYAxis(angle);
+		from = R.mulVec(from).normalize();
+		up = R.mulVec(up).normalize();
+		to = R.mulVec(to).normalize();
+	}
 };
