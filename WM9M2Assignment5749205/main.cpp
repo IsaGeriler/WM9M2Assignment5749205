@@ -1,5 +1,5 @@
-#define WIDTH 2560   // Dell XPS - 1920 || HP Omen Max 16 - 2560
-#define HEIGHT 1600  // Dell XPS - 1200 || HP Omen Max 16 - 1600
+#define WIDTH 1920   // Dell XPS - 1920 || HP Omen Max 16 - 2560
+#define HEIGHT 1200  // Dell XPS - 1200 || HP Omen Max 16 - 1600
 
 #include "Camera.h"
 #include "Core.h"
@@ -34,7 +34,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	core.initialize(window.hwnd, WIDTH, HEIGHT);
 
 	Camera camera;
-	camera.setLense(WIDTH, HEIGHT, 10000.f, 0.01f, 45.f);
+	camera.setCamera(WIDTH, HEIGHT, 10000.f, 0.01f, 45.f);
 
 	PSOManager psos;
 	ShaderManager shaders;
@@ -73,6 +73,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		if (window.keys[VK_ESCAPE] == 1) break;
 
 		time += dt;
+		camera.updateViewMatrix();
 		Matrix v = camera.view;
 		Matrix p = camera.projection;
 		Matrix vp = v * p;
@@ -80,10 +81,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		character.movePlayer(&camera, &window, dt);
 
 		// TO:DO - Camera Control via Mouse (Arrow Keys for now)
-		if (window.keys[VK_UP]) camera.pitch(2.f * dt);
-		if (window.keys[VK_LEFT]) camera.rotateY(-2.f * dt);
-		if (window.keys[VK_DOWN]) camera.pitch(-2.f * dt);
-		if (window.keys[VK_RIGHT]) camera.rotateY(2.f * dt);
+		if (window.keys[VK_UP]) camera.pitch(1.f * dt);
+		if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
+		if (window.keys[VK_LEFT]) camera.rotateY(1.f * dt);
+		if (window.keys[VK_RIGHT]) camera.rotateY(-1.f * dt);
 
 		Matrix planeWorld = Matrix::identity();
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f));

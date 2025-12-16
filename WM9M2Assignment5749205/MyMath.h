@@ -388,6 +388,19 @@ public:
 		return look;
 	}
 
+	// LookAt Matrix (on already calculated dir - to - up')
+	static Matrix lookAt(const Vec3& position, const Vec3& right, const Vec3& up, const Vec3& dir) {
+		Matrix look;
+
+		// Assign the matrix
+		look[0] = right.x; look[1] = right.y; look[2] = right.z; look[3] = -Dot(position, right);
+		look[4] = up.x; look[5] = up.y; look[6] = up.z; look[7] = -Dot(position, up);
+		look[8] = dir.x; look[9] = dir.y; look[10] = dir.z; look[11] = -Dot(position, dir);
+		look[12] = 0.f; look[13] = 0.f; look[14] = 0.f; look[15] = 1.f;
+
+		return look;
+	}
+
 	static Matrix rotateAxis(Vec3& axis, float angle) {
 		Vec3 u = axis.normalize();
 		float c = cosf(angle);
