@@ -34,7 +34,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	core.initialize(window.hwnd, WIDTH, HEIGHT);
 
 	Camera camera;
-	camera.setLense(WIDTH, HEIGHT, 1000.f, 1.f, 45.f);
+	camera.setLense(WIDTH, HEIGHT, 10000.f, 0.01f, 45.f);
 
 	PSOManager psos;
 	ShaderManager shaders;
@@ -72,18 +72,20 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		window.processMessages();
 		if (window.keys[VK_ESCAPE] == 1) break;
 
+		// Controlling the camera with keyboard (mouse support soon...)
 		if (window.keys['W'] == 1) camera.walk(10.f * dt);
 		if (window.keys['S'] == 1) camera.walk(-10.f * dt);
 		if (window.keys['A'] == 1) camera.strafe(-10.f * dt);
 		if (window.keys['D'] == 1) camera.strafe(10.f * dt);
 
+		if (window.keys[VK_UP]) camera.pitch(1.f * dt);
+		if (window.keys[VK_LEFT]) camera.rotateY(-1.f * dt);
+		if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
+		if (window.keys[VK_RIGHT]) camera.rotateY(1.f * dt);
+
 		camera.updateViewMatrix();
 
-		time += dt;		
-		//Vec3 from = Vec3(11.f * cos(time), 5.f, 11.f * sinf(time));
-		//Matrix v = Matrix::lookAt(from, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
-		//Matrix p = Matrix::projection(WIDTH, HEIGHT, 10000.f, 0.01f, 60.f);  // Projection (Perspective) Matrix
-		//Matrix vp = v * p;
+		time += dt;
 		Matrix v = camera.view;
 		Matrix p = camera.projection;
 		Matrix vp = v * p;

@@ -691,20 +691,6 @@ public:
 	}
 };
 
-// Gerstner Wave
-class GerstnerWave {
-public:
-	std::vector<Vec3> verticesPosition;
-
-	void loadVerticesPosition(std::vector<Vec3>& _verticesPosition) {
-		verticesPosition = _verticesPosition;
-	}
-
-	Vec3 displacementVector(int amplitute) {
-		return Vec3(0.f, 0.f, 0.f);
-	}
-};
-
 // Sphere
 class BoundingSphere {
 public:
@@ -732,32 +718,32 @@ public:
 };
 
 // Axis Alligned Bounding Box
-//class AABB {
-//public:
-//	Vec3 max;
-//	Vec3 min;
-//
-//	AABB() { reset(); }
-//
-//	void reset() {
-//		max = Vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-//		min = Vec3(FLT_MAX, FLT_MAX, FLT_MAX);
-//	}
-//
-//	void extend(const Vec3& p) {
-//		max = Max(max, p);
-//		min = Min(min, p);
-//	}
-//
-//	// Slab Test for Ray-AABB Collision
-//	bool rayAABB(const Ray& r, float& t) {
-//		Vec3 s = (min - r.o) * r.invdir;
-//		Vec3 l = (max - r.o) * r.invdir;
-//		Vec3 s1 = Min(s, l);
-//		Vec3 l1 = Max(s, l);
-//		float ts = max(s1.x, max(s1.y, s1.z));
-//		float tl = min(l1.x, min(l1.y, l1.z));
-//		t = min(ts, tl);
-//		return (ts < tl);
-//	}
-//};
+class AABB {
+public:
+	Vec3 max;
+	Vec3 min;
+
+	AABB() { reset(); }
+
+	void reset() {
+		max = Vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		min = Vec3(FLT_MAX, FLT_MAX, FLT_MAX);
+	}
+
+	void extend(const Vec3& p) {
+		max = Max(max, p);
+		min = Min(min, p);
+	}
+
+	// Slab Test for Ray-AABB Collision
+	bool rayAABB(const Ray& r, float& t) {
+		Vec3 s = (min - r.o) * r.invdir;
+		Vec3 l = (max - r.o) * r.invdir;
+		Vec3 s1 = Min(s, l);
+		Vec3 l1 = Max(s, l);
+		float ts = std::max<float>(s1.x, std::max<float>(s1.y, s1.z));
+		float tl = std::min<float>(l1.x, std::min<float>(l1.y, l1.z));
+		t = std::min<float>(ts, tl);
+		return (ts < tl);
+	}
+};
