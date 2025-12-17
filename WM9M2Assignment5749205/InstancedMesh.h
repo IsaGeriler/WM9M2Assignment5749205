@@ -170,6 +170,7 @@ public:
 		D3D12_VERTEX_BUFFER_VIEW bufferViews[2];
 		bufferViews[0] = vbView;
 		bufferViews[1] = instanceView;
+		core->getCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		core->getCommandList()->IASetVertexBuffers(0, 2, bufferViews);
 		core->getCommandList()->IASetIndexBuffer(&ibView);
 		core->getCommandList()->DrawIndexedInstanced(numMeshIndices, numMeshInstances, 0, 0, 0);
