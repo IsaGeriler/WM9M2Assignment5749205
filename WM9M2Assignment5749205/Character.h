@@ -58,6 +58,7 @@ private:
 
 	bool carryGun = true;
 	bool toggleAlternateFire = false;
+	bool zoom = false;
 
 	int animCounter{ 0 };
 public:
@@ -79,7 +80,9 @@ public:
 
 	void movePlayer(Camera* camera, Window* window, float dt) {
 		float speed = (window->keys[VK_SHIFT] == 1) ? sprintSpeed : movementSpeed;
-		State state = (window->keys[VK_SHIFT] == 1) ? Run : Walk;
+		State state;
+		if (zoom) state = ZoomWalk;
+		else state = (window->keys[VK_SHIFT] == 1) ? Run : Walk;
 
 		// Camera and Player Movement via Keyboard
 		if (window->keys['W'] == 1 && carryGun) {
@@ -134,7 +137,8 @@ public:
 	void selectWeapon(Window* window) {
 		if (window->keys['O'] && carryGun == false) {
 			carryGun = true;
-			setAnimationState(Select);
+			if (bulletsInClip == 0) setAnimationState(EmptySelect);
+			else setAnimationState(Select);
 		}
 	}
 
@@ -159,9 +163,11 @@ public:
 	// Shoot Bullet (needs collision detection for damage)
 	void shoot(Window* window) {
 		if (window->keys['F'] == 1) {
+			State state;
 			if (bulletsInClip > 0) {
 				int deduceBullet = (toggleAlternateFire) ? 3 : 1;
-				State state = (toggleAlternateFire) ? Fire : AlternateFire;
+				if (zoom) state = ZoomIdle;
+				else state = (toggleAlternateFire) ? Fire : AlternateFire;
 				bulletsInClip -= std::max<int>(deduceBullet, bulletsInClip);
 				setAnimationState(state);
 			} else {
@@ -170,20 +176,13 @@ public:
 		}
 	}
 
-	/*
-		case EmptySelect: { return "03 empty select"; break; }
-		case ZoomIdle: { return "11 zoom idle"; break; }
-		case ZoomWalk: { return "12 zoom walk"; break; }
-		case ZoomFire: { return "13 zoom fire"; break; }
-		case ZoomAlternateFire: { return "14 zoom alternate fire"; break; }
-	*/
-
 	void animate(float dt) {
 		updateAnimation(dt);
 		resetAnimationTime();
 	}
 
 	void resetAnimationState() {
-		state = Idle;
+		if (zoom) state = ZoomIdle;
+		else state = Idle;
 	}
 };

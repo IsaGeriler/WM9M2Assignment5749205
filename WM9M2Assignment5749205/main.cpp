@@ -81,7 +81,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		character.movePlayer(&camera, &window, dt);
 		character.inspectWeapon(&window);
 		character.meleeAttack(&window);
-		character.animate(dt);
 		character.selectWeapon(&window);
 		character.putawayWeapon(&window);
 		character.reload(&window);
@@ -116,6 +115,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
 		trex.draw(&core, &animatedInstance, &textures, &psos, &shaders, vp, trexWorld);
 		
+		character.animate(dt);
 		character.draw(&core, &textures, &psos, &shaders, vp, characterWorld);
 		sphere.draw(&core, &psos, &textures, &shaders, vp, sphereWorld);
 
