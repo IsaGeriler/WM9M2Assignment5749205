@@ -19,25 +19,26 @@ enum State {
 
 std::string getAnimationByState(State state) {
 	switch (state) {
-		case Pose: return "00 pose";
-		case Select: return "01 select";
-		case Putaway: return "02 putaway";
-		case EmptySelect: return "03 empty select";
-		case Idle: return "04 idle";
-		case Inspect: return "05 inspect";
-		case Walk: return "06 walk";
-		case Run: return "07 run";
-		case Fire: return "08 fire";
-		case AlternateFire: return "09 alternate fire";
-		case MeleeAttack: return "10 melee attack";
-		case ZoomIdle: return "11 zoom idle";
-		case ZoomWalk: return "12 zoom walk";
-		case ZoomFire: return "13 zoom fire";
-		case ZoomAlternateFire: return "14 zoom alternate fire";
-		case AlternateFireModeOn: return "15 alternate fire mode on";
-		case DryFire: return "16 dryfire";
-		case Reload: return "17 reload";
-		case EmptyReload: return "18 empty reload";
+		case Pose: { return "00 pose"; break; }
+		case Select: { return "01 select"; break; }
+		case Putaway: { return "02 putaway"; break; }
+		case EmptySelect: { return "03 empty select"; break; }
+		case Idle: { return "04 idle"; break; }
+		case Inspect: { return "05 inspect"; break; }
+		case Walk: { return "06 walk"; break; }
+		case Run: { return "07 run"; break; }
+		case Fire: { return "08 fire"; break; }
+		case AlternateFire: { return "09 alternate fire"; break; }
+		case MeleeAttack: { return "10 melee attack"; break; }
+		case ZoomIdle: { return "11 zoom idle"; break; }
+		case ZoomWalk: { return "12 zoom walk"; break; }
+		case ZoomFire: { return "13 zoom fire"; break; }
+		case ZoomAlternateFire: { return "14 zoom alternate fire"; break; }
+		case AlternateFireModeOn: { return "15 alternate fire mode on"; break; }
+		case DryFire: { return "16 dryfire"; break; }
+		case Reload: { return "17 reload"; break; }
+		case EmptyReload: { return "18 empty reload"; break; }
+		default: { return "04 idle"; break; }
 	}
 }
 
@@ -60,10 +61,10 @@ public:
 	void initialize(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, std::string filename) {
 		animatedModel.load(core, psos, textures, shaders, filename);
 		animationInstance.initialize(&animatedModel.animation, 0);
-		state = Pose;
+		state = Idle;
 	}
 
-	void setAnmationState(State _state) { state = _state; }
+	void setAnimationState(State _state) { state = _state; }
 	void updateAnimation(float dt) { animationInstance.update(getAnimationByState(state), dt); }
 	void resetAnimationTime() { if (animationInstance.animationFinished() == true) animationInstance.resetAnimationTime(); }
 
@@ -73,33 +74,44 @@ public:
 
 	void movePlayer(Camera* camera, Window* window, float dt) {
 		float speed = (window->keys[VK_SHIFT] == 1) ? sprintSpeed : movementSpeed;
-		State animState = (window->keys[VK_SHIFT] == 1) ? Run : Walk;
 
 		// Camera and Player Movement via Keyboard
 		if (window->keys['W'] == 1) {
+			setAnimationState((window->keys[VK_SHIFT] == 1) ? Run : Walk);
 			camera->walk(speed * dt);
 			positionY += speed * dt;
 		}
 
 		if (window->keys['S'] == 1) {
+			setAnimationState((window->keys[VK_SHIFT] == 1) ? Run : Walk);
 			camera->walk(-speed * dt);
 			positionY -= speed * dt;
 		}
 
 		if (window->keys['A'] == 1) {
+			setAnimationState((window->keys[VK_SHIFT] == 1) ? Run : Walk);
 			camera->strafe(-speed * dt);
 			positionX -= speed * dt;
 		}
 
 		if (window->keys['D'] == 1) {
+			setAnimationState((window->keys[VK_SHIFT] == 1) ? Run : Walk);
 			camera->strafe(speed * dt);
 			positionX += speed * dt;
 		}
-
-		updateAnimation(dt);
-		resetAnimationTime();
 		camera->updateViewMatrix();
 	}
 
-	// Make functions for idle and shoot (and their zoomed ver. i.e. hold right click)...
+	void inspectWeapon(Window* window) {
+		if (window->keys['I'] == 1) setAnimationState(Inspect);
+	}
+
+	void meleeAttack(Window* window) {
+		if (window->keys['M'] == 1) setAnimationState(MeleeAttack);
+	}
+
+	void animate(float dt) {
+		updateAnimation(dt);
+		resetAnimationTime();
+	}
 };

@@ -79,6 +79,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Matrix vp = v * p;
 
 		character.movePlayer(&camera, &window, dt);
+		character.inspectWeapon(&window);
+		character.meleeAttack(&window);
+		character.animate(dt);
 
 		// TO:DO - Camera Control via Mouse (Arrow Keys for now)
 		if (window.keys[VK_UP]) camera.pitch(1.f * dt);
@@ -86,12 +89,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		if (window.keys[VK_LEFT]) camera.rotateY(1.f * dt);
 		if (window.keys[VK_RIGHT]) camera.rotateY(-1.f * dt);
 
-		Matrix planeWorld = Matrix::identity();
-		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f));
+		Matrix planeWorld = Matrix::identity() * Matrix::rotateOnYAxis(M_PI);
+		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix sphereWorld = Matrix::identity();
-		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::translate(Vec3(-5.f, 1.f, 0.f));
-		Matrix foodWarmerWorld = Matrix::scale(Vec3(2.f, 2.f, 2.f)) * Matrix::translate(Vec3(0.f, 0.f, 3.f));
-		Matrix trexWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f));
+		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::translate(Vec3(-5.f, 1.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
+		Matrix foodWarmerWorld = Matrix::scale(Vec3(2.f, 2.f, 2.f)) * Matrix::translate(Vec3(0.f, 0.f, 3.f)) * Matrix::rotateOnYAxis(M_PI);
+		Matrix trexWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix characterWorld = Matrix::scale(Vec3(0.3f, 0.3f, 0.3f)) * Matrix::rotateOnYAxis(M_PI) * Matrix::translate(Vec3(0.f, 1.f, 0.f)) * camera.view.invert();
 
 		core.beginRenderPass();
@@ -101,7 +104,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		acacia.draw(&core, &psos, &textures, &shaders, vp, acaciaWorld);
 		foodWarmer.draw(&core, &psos, &textures, &shaders, vp, foodWarmerWorld);
 
-		cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f));
+		cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
 		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		
 		animatedInstance.update("run", dt);
