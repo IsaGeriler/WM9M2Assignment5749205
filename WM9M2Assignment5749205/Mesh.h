@@ -24,10 +24,6 @@ struct ANIMATED_VERTEX {
 	float boneWeights[4];
 };
 
-struct INSTANCE {
-	Matrix w;
-};
-
 class VertexLayoutCache {
 public:
 	static const D3D12_INPUT_LAYOUT_DESC& getStaticLayout() {
@@ -37,20 +33,6 @@ public:
 		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, };
 		static const D3D12_INPUT_LAYOUT_DESC desc = { inputLayoutStatic, 4 };
-		return desc;
-	}
-
-	static const D3D12_INPUT_LAYOUT_DESC& getStaticInstancedLayout() {
-		D3D12_INPUT_ELEMENT_DESC inputLayoutStaticInstanced[] = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 },
-		{ "WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 },
-		{ "WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 },
-		{ "WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 },};
-		static const D3D12_INPUT_LAYOUT_DESC desc = { inputLayoutStaticInstanced, 8 };
 		return desc;
 	}
 
@@ -72,12 +54,10 @@ public:
 	// Create buffer and upload vertices to GPU
 	ID3D12Resource* vertexBuffer;
 	ID3D12Resource* indexBuffer;
-	//ID3D12Resource* instanceBuffer;
 
 	// Create view member variable
 	D3D12_VERTEX_BUFFER_VIEW vbView;
 	D3D12_INDEX_BUFFER_VIEW ibView;
-	//D3D12_VERTEX_BUFFER_VIEW instanceView;
 
 	// Define layout
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc;
@@ -125,21 +105,6 @@ public:
 		// Allocate memory
 		hr = core->device->CreateCommittedResource(&heapprops, D3D12_HEAP_FLAG_NONE, &ibDesc, D3D12_RESOURCE_STATE_COMMON, NULL, IID_PPV_ARGS(&indexBuffer));
 		core->uploadResource(indexBuffer, indices, numIndices * sizeof(unsigned int), D3D12_RESOURCE_STATE_INDEX_BUFFER);
-
-		// Create instance buffer on heap
-		//D3D12_RESOURCE_DESC instanceDesc = {};
-		//instanceDesc.Width = numInstances * instanceSizeInBytes;
-		//instanceDesc.Height = 1;
-		//instanceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		//instanceDesc.DepthOrArraySize = 1;
-		//instanceDesc.MipLevels = 1;
-		//instanceDesc.SampleDesc.Count = 1;
-		//instanceDesc.SampleDesc.Quality = 0;
-		//instanceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-
-		// Allocate memory
-		//hr = core->device->CreateCommittedResource(&heapprops, D3D12_HEAP_FLAG_NONE, &instanceDesc, D3D12_RESOURCE_STATE_COMMON, NULL, IID_PPV_ARGS(&instanceBuffer));
-		//core->uploadResource(instanceBuffer, vertices, numInstances * instanceSizeInBytes, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 		
 		// Create view to Vertex Buffer
 		vbView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
@@ -150,11 +115,6 @@ public:
 		ibView.BufferLocation = indexBuffer->GetGPUVirtualAddress();
 		ibView.Format = DXGI_FORMAT_R32_UINT;
 		ibView.SizeInBytes = numIndices * sizeof(unsigned int);
-
-		// Create view to Instance Buffert
-		//instanceView.BufferLocation = instanceBuffer->GetGPUVirtualAddress();
-		//instanceView.StrideInBytes = instanceSizeInBytes;
-		//instanceView.SizeInBytes = numInstances * instanceSizeInBytes;
 
 		numMeshIndices = numIndices;
 	}
@@ -174,12 +134,5 @@ public:
 		core->getCommandList()->IASetVertexBuffers(0, 1, &vbView);
 		core->getCommandList()->IASetIndexBuffer(&ibView);
 		core->getCommandList()->DrawIndexedInstanced(numMeshIndices, 1, 0, 0, 0);
-
-		//D3D12_VERTEX_BUFFER_VIEW bufferViews[2];
-		//bufferViews[0] = vbView;
-		//bufferViews[1] = instanceView;
-		//core->getCommandList()->IASetVertexBuffers(0, 2, bufferViews);
-		//core->getCommandList()->IASetIndexBuffer(&ibView);
-		//core->getCommandList()->DrawIndexedInstanced(numMeshIndices, numInstances, 0, 0, 0);
 	}
 };
