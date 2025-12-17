@@ -147,6 +147,10 @@
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="VertexShaderAnimatedInstanced.txt" />
+    <Text Include="VertexShaderStaticInstanced.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

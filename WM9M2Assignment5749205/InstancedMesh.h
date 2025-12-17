@@ -61,7 +61,7 @@ public:
 	}
 };
 
-class Mesh {
+class InstancedMesh {
 public:
 	// Create buffer and upload vertices to GPU
 	ID3D12Resource* vertexBuffer;
@@ -78,7 +78,7 @@ public:
 	unsigned int numMeshIndices;
 	unsigned int numMeshInstances;
 
-	~Mesh() {
+	~InstancedMesh() {
 		indexBuffer->Release();
 		instanceBuffer->Release();
 		vertexBuffer->Release();
