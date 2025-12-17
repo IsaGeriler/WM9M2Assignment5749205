@@ -85,7 +85,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		character.selectWeapon(&window);
 		character.putawayWeapon(&window);
 		character.reload(&window);
-		character.alternateFireMode(&window);
+		character.toggleAlternateFireMode(&window);
+		character.shoot(&window);
 
 		// TO:DO - Camera Control via Mouse (Arrow Keys for now)
 		if (window.keys[VK_UP]) camera.pitch(1.f * dt);

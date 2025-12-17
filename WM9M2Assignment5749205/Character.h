@@ -66,7 +66,7 @@ public:
 	void initialize(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, std::string filename) {
 		animatedModel.load(core, psos, textures, shaders, filename);
 		animationInstance.initialize(&animatedModel.animation, 0);
-		state = Idle;
+		state = Pose;
 	}
 
 	void setAnimationState(State _state) { state = _state; }
@@ -148,24 +148,34 @@ public:
 		}
 	}
 
-	// Alternate Fire Mode
-	void alternateFireMode(Window* window) {
+	// Toggle Alternate Fire Mode
+	void toggleAlternateFireMode(Window* window) {
 		if (window->keys[VK_SPACE]) {
 			toggleAlternateFire = !toggleAlternateFire;
 			setAnimationState(AlternateFireModeOn);
 		}
 	}
 
+	// Shoot Bullet (needs collision detection for damage)
+	void shoot(Window* window) {
+		if (window->keys['F'] == 1) {
+			if (bulletsInClip > 0) {
+				int deduceBullet = (toggleAlternateFire) ? 3 : 1;
+				State state = (toggleAlternateFire) ? Fire : AlternateFire;
+				bulletsInClip -= std::max<int>(deduceBullet, bulletsInClip);
+				setAnimationState(state);
+			} else {
+				setAnimationState(DryFire);
+			}
+		}
+	}
+
 	/*
-		case Pose: { return "00 pose"; break; }
 		case EmptySelect: { return "03 empty select"; break; }
-		case Fire: { return "08 fire"; break; }
-		case AlternateFire: { return "09 alternate fire"; break; }
 		case ZoomIdle: { return "11 zoom idle"; break; }
 		case ZoomWalk: { return "12 zoom walk"; break; }
 		case ZoomFire: { return "13 zoom fire"; break; }
 		case ZoomAlternateFire: { return "14 zoom alternate fire"; break; }
-		case DryFire: { return "16 dryfire"; break; }
 	*/
 
 	void animate(float dt) {
