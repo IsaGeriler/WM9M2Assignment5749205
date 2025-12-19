@@ -109,59 +109,68 @@ public:
 			positionX += speed * dt;
 		}
 		camera->updateViewMatrix();
+		animate(dt, true);
 	}
 
 	// Inspect Weapon
-	void inspectWeapon(Window* window) {
-		if (window->keys['I'] == 1 && carryGun) {
-			setAnimationState(Inspect);
-		}
+	void inspectWeapon(Window* window, float dt) {
+		if (window->keys['I'] == 1 && carryGun) setAnimationState(Inspect);
+		if (animationInstance.animationFinished()) setAnimationState(Idle);
+		animate(dt, false);
 	}
 
 	// Perform Melee Attack (needs collision detection for damage)
-	void meleeAttack(Window* window) {
-		if (window->keys['M'] == 1 && carryGun) {
-			setAnimationState(MeleeAttack);
-		}
+	void meleeAttack(Window* window, float dt) {
+		if (window->keys['M'] == 1 && carryGun) setAnimationState(MeleeAttack);
+		if (animationInstance.animationFinished()) setAnimationState(Idle);
+		animate(dt, false);
 	}
 
 	// Putaway the carbine
-	void putawayWeapon(Window* window) {
+	void putawayWeapon(Window* window, float dt) {
 		if (window->keys['P'] && carryGun == true) {
 			carryGun = false;
 			setAnimationState(Putaway);
 		}
+		if (animationInstance.animationFinished()) setAnimationState(Idle);
+		animate(dt, false);
 	}
 
 	// Select the carbine
-	void selectWeapon(Window* window) {
+	void selectWeapon(Window* window, float dt) {
 		if (window->keys['O'] && carryGun == false) {
 			carryGun = true;
 			if (bulletsInClip == 0) setAnimationState(EmptySelect);
 			else setAnimationState(Select);
 		}
+		if (animationInstance.animationFinished()) setAnimationState(Idle);
+		animate(dt, false);
 	}
 
 	// Reload
-	void reload(Window* window) {
+	void reload(Window* window, float dt) {
 		if (window->keys['R'] && (bulletsInClip < 30 && totalAmmo > 0)) {
 			State state = (bulletsInClip == 0) ? EmptyReload : Reload;
 			bulletsInClip = std::min<int>(30, totalAmmo);
 			totalAmmo -= bulletsInClip;
 			setAnimationState(state);
 		}
+		if (animationInstance.animationFinished()) setAnimationState(Idle);
+		animate(dt, false);
 	}
 
 	// Toggle Alternate Fire Mode
-	void toggleAlternateFireMode(Window* window) {
+	void toggleAlternateFireMode(Window* window, float dt) {
 		if (window->keys[VK_SPACE]) {
 			toggleAlternateFire = !toggleAlternateFire;
 			setAnimationState(AlternateFireModeOn);
 		}
+		if (animationInstance.animationFinished()) setAnimationState(Idle);
+		animate(dt, false);
 	}
 
 	// Shoot Bullet (needs collision detection for damage)
-	void shoot(Window* window) {
+	void shoot(Window* window, float dt) {
 		if (window->keys['F'] == 1) {
 			State state;
 			if (bulletsInClip > 0) {
@@ -174,11 +183,13 @@ public:
 				setAnimationState(DryFire);
 			}
 		}
+		if (animationInstance.animationFinished()) setAnimationState(Idle);
+		animate(dt, false);
 	}
 
-	void animate(float dt) {
+	void animate(float dt, bool continuous) {
 		updateAnimation(dt);
-		resetAnimationTime();
+		if (continuous && animationInstance.animationFinished()) resetAnimationTime();
 	}
 
 	void resetAnimationState() {

@@ -146,7 +146,7 @@ public:
 	}
 
 	// Initialize Instanced Meshes
-	void initialize(Core* core, void* vertices, int vertexSizeInBytes, int numVertices, unsigned int* indices, int numIndices, void* instances, int numInstances, int instanceSizeInBytes) {
+	void initialize(Core* core, void* vertices, int vertexSizeInBytes, int numVertices, unsigned int* indices, int numIndices, void* instances, int instanceSizeInBytes, int numInstances) {
 		// Specify vertex buffer will be in GPU memory heap
 		D3D12_HEAP_PROPERTIES heapprops = {};
 		heapprops.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -225,7 +225,8 @@ public:
 	}
 
 	void initialize(Core* core, std::vector<STATIC_VERTEX> vertices, std::vector<unsigned int> indices, std::vector<INSTANCE_DATA> instances) {
-		initialize(core, &vertices[0], sizeof(STATIC_VERTEX), vertices.size(), &indices[0], indices.size(), &instances[0], instances.size(), sizeof(INSTANCE_DATA));
+		initialize(core, &vertices[0], sizeof(STATIC_VERTEX), vertices.size(), &indices[0], indices.size(), &instances[0], sizeof(INSTANCE_DATA), instances.size());
+		isInstanced = true;
 		inputLayoutDesc = VertexLayoutCache::getStaticInstancedLayout();
 	}
 

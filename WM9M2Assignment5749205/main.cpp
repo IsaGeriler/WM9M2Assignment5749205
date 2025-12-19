@@ -55,9 +55,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	StaticInstancedModel instancedTree;
 	std::vector<INSTANCE_DATA> instances;
 	
-	for (int i = 0; i < 10; i++) {
-		for (int j = 0; j < 10; j++) {
-			for (int k = 0; k < 10; k++) {
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			for (int k = 0; k < 5; k++) {
 				INSTANCE_DATA ins;
 				ins.world = Matrix::translate(Vec3((float)i, (float)j, (float)k));
 				instances.push_back(ins);
@@ -65,7 +65,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		}
 	}
 
-	// instancedTree.load(&core, &psos, &textures, &shaders, "Models/banana2_LOD5.gem", instances);
+	//instancedTree.load(&core, &psos, &textures, &shaders, "Models/banana2_LOD5.gem", instances);
 
 	StaticModel foodWarmer;
 	foodWarmer.load(&core, &psos, &textures, &shaders, "Models/Food_Warmer_07a.gem");
@@ -94,13 +94,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Matrix vp = v * p;
 
 		character.movePlayer(&camera, &window, dt);
-		character.inspectWeapon(&window);
-		character.meleeAttack(&window);
-		character.selectWeapon(&window);
-		character.putawayWeapon(&window);
-		character.reload(&window);
-		character.toggleAlternateFireMode(&window);
-		character.shoot(&window);
+		character.inspectWeapon(&window, dt);
+		character.meleeAttack(&window, dt);
+		character.selectWeapon(&window, dt);
+		character.putawayWeapon(&window, dt);
+		character.reload(&window, dt);
+		character.toggleAlternateFireMode(&window, dt);
+		character.shoot(&window, dt);
 
 		// TO:DO - Camera Control via Mouse (Arrow Keys for now)
 		if (window.keys[VK_UP]) camera.pitch(1.f * dt);
@@ -130,9 +130,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
 		trex.draw(&core, &animatedInstance, &textures, &psos, &shaders, vp, trexWorld);
 		
-		character.animate(dt);
+		// character.animate(dt);
 		character.draw(&core, &textures, &psos, &shaders, vp, characterWorld);
-		// instancedTree.draw(&core, &psos, &textures, &shaders, vp);
+		//instancedTree.draw(&core, &psos, &textures, &shaders, vp);
 		sphere.draw(&core, &psos, &textures, &shaders, vp, sphereWorld);
 
 		core.finishFrame();
