@@ -67,3 +67,55 @@ public:
 		}
 	}
 };
+
+class StaticInstancedModel {
+public:
+	std::vector<Mesh*> meshes;
+	std::vector<std::string> albedoFilenames;
+	std::vector<std::string> normalFilenames;
+
+	void load(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, std::string filename, std::vector<INSTANCE_DATA> worlds) {
+		GEMLoader::GEMModelLoader loader;
+		std::vector<GEMLoader::GEMMesh> gemmeshes;
+		loader.load(filename, gemmeshes);
+
+		for (int i = 0; i < gemmeshes.size(); i++) {
+			Mesh* mesh = new Mesh();
+			std::vector<STATIC_VERTEX> vertices;
+			for (int j = 0; j < gemmeshes[i].verticesStatic.size(); j++) {
+				STATIC_VERTEX v;
+				memcpy(&v, &gemmeshes[i].verticesStatic[j], sizeof(STATIC_VERTEX));
+				vertices.push_back(v);
+			}
+			// Load texture with filename: gemmeshes[i].material.find("albedo").getValue()
+			albedoFilenames.push_back(gemmeshes[i].material.find("albedo").getValue());
+			normalFilenames.push_back(gemmeshes[i].material.find("nh").getValue());
+
+			textures->loadTexture(core, albedoFilenames[i], gemmeshes[i].material.find("albedo").getValue());
+			textures->loadTexture(core, normalFilenames[i], gemmeshes[i].material.find("nh").getValue());
+			
+			mesh->initialize(core, vertices, gemmeshes[i].indices, worlds);
+			meshes.push_back(mesh);
+		}
+		shaders->loadShader(core, "StaticModelTexturedInstanced", "VertexShaderStaticInstanced.txt", "PixelShaderMultipleTextured.txt");
+		psos->createPSO(core, "StaticModelInstancedPSO", shaders->getShader("StaticModelTexturedInstanced")->vertexShader, shaders->getShader("StaticModelTexturedInstanced")->pixelShader, VertexLayoutCache::getStaticInstancedLayout());
+	}
+
+	void draw(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, Matrix& vp) {
+		psos->bind(core, "StaticModelInstancedPSO");
+		shaders->updateConstantVertexShaderBuffer("StaticModelTexturedInstanced", "staticMeshBuffer", "VP", &vp);
+		shaders->apply(core, "StaticModelTexturedInstanced");
+
+		for (int i = 0; i < meshes.size(); i++) {
+			std::cout << albedoFilenames[i] << ' ' << textures->find(albedoFilenames[i]) << '\n';
+			std::cout << normalFilenames[i] << ' ' << textures->find(normalFilenames[i]) << '\n';
+
+			// Normal map can be found in gemmeshes[i].material.find("nh").getValue()
+			// The rgb channels contain the normal map, and the alpha channel contains a height map
+
+			shaders->updateTexturePS(core, "StaticModelTexturedInstanced", "albedoTexture", textures->find(albedoFilenames[i]));
+			shaders->updateTexturePS(core, "StaticModelTexturedInstanced", "normalsTexture", textures->find(normalFilenames[i]));
+			meshes[i]->draw(core);
+		}
+	}
+};
