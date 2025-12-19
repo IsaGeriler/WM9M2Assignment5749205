@@ -111,7 +111,7 @@ public:
 
 	void draw(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, Matrix& vp) {
 		psos->bind(core, psoname);
-		shaders->updateConstantVertexShaderBuffer(shadername, "staticMeshBuffer", "VP", &vp);
+		shaders->updateConstantVertexShaderBuffer(shadername, "staticInstacedMeshBuffer", "VP", &vp);
 		shaders->apply(core, shadername);
 
 		for (int i = 0; i < meshes.size(); i++) {

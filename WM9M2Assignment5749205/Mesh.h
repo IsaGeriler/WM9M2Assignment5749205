@@ -41,7 +41,7 @@ public:
 	}
 
 	static const D3D12_INPUT_LAYOUT_DESC& getStaticInstancedLayout() {
-		D3D12_INPUT_ELEMENT_DESC inputLayoutStaticInstanced[] = {
+		static const D3D12_INPUT_ELEMENT_DESC inputLayoutStaticInstanced[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -226,8 +226,8 @@ public:
 
 	void initialize(Core* core, std::vector<STATIC_VERTEX> vertices, std::vector<unsigned int> indices, std::vector<INSTANCE_DATA> instances) {
 		initialize(core, &vertices[0], sizeof(STATIC_VERTEX), vertices.size(), &indices[0], indices.size(), &instances[0], sizeof(INSTANCE_DATA), instances.size());
-		isInstanced = true;
 		inputLayoutDesc = VertexLayoutCache::getStaticInstancedLayout();
+		isInstanced = true;
 	}
 
 	void initialize(Core* core, std::vector<ANIMATED_VERTEX> vertices, std::vector<unsigned int> indices) {

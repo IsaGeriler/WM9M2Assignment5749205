@@ -57,15 +57,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 5; j++) {
-			for (int k = 0; k < 5; k++) {
-				INSTANCE_DATA ins;
-				ins.world = Matrix::translate(Vec3((float)i, (float)j, (float)k));
-				instances.push_back(ins);
-			}
+			INSTANCE_DATA ins;
+			ins.world = Matrix::translate(Vec3((float)i * 200.f, 0.f, (float)j * 200.f)) * Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::rotateOnYAxis(M_PI);
+			instances.push_back(ins);
 		}
 	}
 
-	//instancedTree.load(&core, &psos, &textures, &shaders, "Models/banana2_LOD5.gem", instances);
+	instancedTree.load(&core, &psos, &textures, &shaders, "Models/banana2.gem", instances);
 
 	StaticModel foodWarmer;
 	foodWarmer.load(&core, &psos, &textures, &shaders, "Models/Food_Warmer_07a.gem");
@@ -132,7 +130,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		
 		// character.animate(dt);
 		character.draw(&core, &textures, &psos, &shaders, vp, characterWorld);
-		//instancedTree.draw(&core, &psos, &textures, &shaders, vp);
+		instancedTree.draw(&core, &psos, &textures, &shaders, vp);
 		sphere.draw(&core, &psos, &textures, &shaders, vp, sphereWorld);
 
 		core.finishFrame();
