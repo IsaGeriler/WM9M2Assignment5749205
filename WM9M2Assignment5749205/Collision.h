@@ -59,7 +59,7 @@ public:
 	}
 };
 
-static bool collisionAabbAabb(AABB object1, AABB object2) {
+static bool collisionAabbAabb(const AABB& object1, const AABB& object2) {
 	// Calculate Penetration Depths
 	float pdx = std::min<float>(object1.max.x, object2.max.x) - std::max<float>(object1.min.x, object2.min.x);
 	float pdy = std::min<float>(object1.max.y, object2.max.y) - std::max<float>(object1.min.y, object2.min.y);
@@ -68,10 +68,15 @@ static bool collisionAabbAabb(AABB object1, AABB object2) {
 	return pdx > 0 && pdy > 0 && pdz > 0;
 }
 
-static bool collisionSphereAabb(BoundingSphere object1, AABB object2) {
-	// W.I.P
+static bool collisionSphereAabb(const BoundingSphere& object1, const AABB& object2) {
+	// Find the closest point on AABB to Sphere centre
+	float px = std::max<float>(object2.min.x, std::min<float>(object1.centre.x, object2.max.x));
+	float py = std::max<float>(object2.min.y, std::min<float>(object1.centre.y, object2.max.y));
+	float pz = std::max<float>(object2.min.z, std::min<float>(object1.centre.z, object2.max.z));
+
+	return powf((object1.centre.x - px) + (object1.centre.y - py) + (object1.centre.z - pz), 2.f) <= powf(object1.radius, 2.f);
 }
 
-static bool collisionRaySphere(BoundingSphere object1, AABB object2) {
+static bool collisionRaySphere(const BoundingSphere& object1, const AABB& object2) {
 	// W.I.P
 }
