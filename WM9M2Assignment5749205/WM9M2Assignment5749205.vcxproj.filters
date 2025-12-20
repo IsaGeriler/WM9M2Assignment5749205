@@ -77,12 +77,11 @@
     <ClInclude Include="Character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InstancedMesh.h">
+    <ClInclude Include="Collision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="VertexShaderStaticInstanced.txt" />
-    <Text Include="VertexShaderAnimatedInstanced.txt" />
   </ItemGroup>
 </Project>

@@ -47,23 +47,37 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	cube.initialize(&core, &psos, &shaders);
 
 	Sphere sphere;
-	sphere.initialize(&core, &psos, &textures, &shaders, 32, 32, 100.f);
+	sphere.initialize(&core, &psos, &textures, &shaders, 32, 32, 1000.f);
 
 	StaticModel acacia;
 	acacia.load(&core, &psos, &textures, &shaders, "Models/banana2.gem");
 
 	StaticInstancedModel instancedTree;
+	StaticInstancedModel instancedGrass;
+
 	std::vector<INSTANCE_DATA> instances;
+	std::vector<INSTANCE_DATA> instancesGrass;
 	
-	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 5; j++) {
+	for (int i = 1; i <= 10; i++) {
+		for (int j = 1; j <= 10; j++) {
 			INSTANCE_DATA ins;
-			ins.world = Matrix::translate(Vec3((float)i * 200.f, 0.f, (float)j * 200.f)) * Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::rotateOnYAxis(M_PI);
+			
+			ins.world = Matrix::translate(Vec3((float)i * 200.f, -60.f, (float)j * 200.f)) * Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::rotateOnYAxis(M_PI);
 			instances.push_back(ins);
+			
+		}
+	}
+	for (int i = 1; i <= 20; i++) {
+		for (int j = 1; j <= 20; j++) {
+			if (i * 50 % 200 == 0 || j * 50 % 200) continue;
+			INSTANCE_DATA insGrass;
+			insGrass.world = Matrix::translate(Vec3((float)i * 50.f, -120.f, (float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+			instancesGrass.push_back(insGrass);
 		}
 	}
 
 	instancedTree.load(&core, &psos, &textures, &shaders, "Models/banana2.gem", instances);
+	instancedGrass.load(&core, &psos, &textures, &shaders, "Models/grass_008.gem", instancesGrass);
 
 	StaticModel foodWarmer;
 	foodWarmer.load(&core, &psos, &textures, &shaders, "Models/Food_Warmer_07a.gem");
@@ -101,17 +115,17 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		character.shoot(&window, dt);
 
 		// TO:DO - Camera Control via Mouse (Arrow Keys for now)
-		if (window.keys[VK_UP]) camera.pitch(1.f * dt);
-		if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
+		//if (window.keys[VK_UP]) camera.pitch(1.f * dt);
+		//if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
 		if (window.keys[VK_LEFT]) camera.rotateY(1.f * dt);
 		if (window.keys[VK_RIGHT]) camera.rotateY(-1.f * dt);
 
-		Matrix planeWorld = Matrix::identity() * Matrix::rotateOnYAxis(M_PI);
+		Matrix planeWorld = Matrix::identity() * Matrix::scale(Vec3(100.f, 100.f, 100.f));
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix sphereWorld = Matrix::identity() * Matrix::rotateOnYAxis(M_PI);
 		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::translate(Vec3(-5.f, 1.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix foodWarmerWorld = Matrix::scale(Vec3(2.f, 2.f, 2.f)) * Matrix::translate(Vec3(0.f, 0.f, 3.f)) * Matrix::rotateOnYAxis(M_PI);
-		Matrix trexWorld = Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+		Matrix trexWorld = Matrix::translate(Vec3(0.f, -100.f, 0.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix characterWorld = Matrix::scale(Vec3(0.3f, 0.3f, 0.3f)) * Matrix::rotateOnYAxis(M_PI) * Matrix::translate(Vec3(0.f, 1.f, 0.f)) * camera.view.invert();
 
 		core.beginRenderPass();
@@ -131,6 +145,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		// character.animate(dt);
 		character.draw(&core, &textures, &psos, &shaders, vp, characterWorld);
 		instancedTree.draw(&core, &psos, &textures, &shaders, vp);
+		instancedGrass.draw(&core, &psos, &textures, &shaders, vp);
 		sphere.draw(&core, &psos, &textures, &shaders, vp, sphereWorld);
 
 		core.finishFrame();

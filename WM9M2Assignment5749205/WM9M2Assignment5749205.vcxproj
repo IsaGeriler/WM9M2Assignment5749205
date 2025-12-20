@@ -131,6 +131,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Character.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="GEMLoader.h" />
