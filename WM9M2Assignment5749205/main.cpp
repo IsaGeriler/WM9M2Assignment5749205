@@ -114,11 +114,15 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		character.toggleAlternateFireMode(&window, dt);
 		character.shoot(&window, dt);
 
-		// TO:DO - Camera Control via Arrow Keys
+		// Camera Control via Arrow Keys
 		if (window.keys[VK_UP]) camera.pitch(1.f * dt);
 		if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
 		if (window.keys[VK_LEFT]) camera.rotateY(1.f * dt);
 		if (window.keys[VK_RIGHT]) camera.rotateY(-1.f * dt);
+		if (window.keys['C'] == 1) camera.resetCamera();
+
+		// Player Control
+
 
 		Matrix planeWorld = Matrix::translate(Vec3(0.f, -120.f, 0.f)) * Matrix::scale(Vec3(100.f, 100.f, 100.f));
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
