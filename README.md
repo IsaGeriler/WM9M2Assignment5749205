@@ -13,5 +13,5 @@
 -	Normal mapping or variant ( e.g. displacement or parallax occlusion mapping)
 -	Simulating one or more effects covered in the lectures (e.g. water, particle system, skybox)
 
-## Placeholder Video for the Current State of the Project
-https://github.com/user-attachments/assets/85881202-2bc9-4d48-987c-948183342a46
+## Placeholder Image for the Current State of the Project
+<img width="1919" height="1129" alt="image" src="https://github.com/user-attachments/assets/5065183c-827b-4dc8-8eba-3181868c671a" />
