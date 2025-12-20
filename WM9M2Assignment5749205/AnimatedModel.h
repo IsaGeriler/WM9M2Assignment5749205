@@ -14,6 +14,9 @@ public:
 	std::vector<Mesh*> meshes;
 	std::vector<std::string> albedoFilenames;
 
+	std::string shadername;
+	std::string psoname;
+
 	void load(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, std::string filename) {
 		// Load in animation data
 		GEMLoader::GEMModelLoader loader;
@@ -36,8 +39,10 @@ public:
 			mesh->initialize(core, vertices, gemmeshes[i].indices);
 			meshes.push_back(mesh);
 		}
-		shaders->loadShader(core, "AnimatedTextured", "VertexShaderAnimated.txt", "PixelShaderTextured.txt");
-		psos->createPSO(core, "AnimatedModelPSO", shaders->getShader("AnimatedTextured")->vertexShader, shaders->getShader("AnimatedTextured")->pixelShader, VertexLayoutCache::getAnimatedLayout());
+		shadername = "AnimatedTextured";
+		psoname = "AnimatedModelPSO";
+		shaders->loadShader(core, shadername, "VertexShaderAnimated.txt", "PixelShaderTextured.txt");
+		psos->createPSO(core, psoname, shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getAnimatedLayout());
 		memcpy(&animation.skeleton.globalInverse, &gemanimation.globalInverse, 16 * sizeof(float));
 
 		// Bones
@@ -74,15 +79,15 @@ public:
 	}
 
 	void draw(Core* core, AnimationInstance* instance, TextureManager* textures, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
-		psos->bind(core, "AnimatedModelPSO");
-		shaders->updateConstantVertexShaderBuffer("AnimatedTextured", "animatedMeshBuffer", "W", &w);
-		shaders->updateConstantVertexShaderBuffer("AnimatedTextured", "animatedMeshBuffer", "VP", &vp);
-		shaders->updateConstantVertexShaderBuffer("AnimatedTextured", "animatedMeshBuffer", "bones", instance->matrices);
-		shaders->apply(core, "AnimatedTextured");
+		psos->bind(core, psoname);
+		shaders->updateConstantVertexShaderBuffer(shadername, "animatedMeshBuffer", "W", &w);
+		shaders->updateConstantVertexShaderBuffer(shadername, "animatedMeshBuffer", "VP", &vp);
+		shaders->updateConstantVertexShaderBuffer(shadername, "animatedMeshBuffer", "bones", instance->matrices);
+		shaders->apply(core, shadername);
 
 		for (int i = 0; i < meshes.size(); i++) {
 			std::cout << albedoFilenames[i] << ' ' << textures->find(albedoFilenames[i]) << '\n';
-			shaders->updateTexturePS(core, "AnimatedTextured", "tex", textures->find(albedoFilenames[i]));
+			shaders->updateTexturePS(core, shadername, "tex", textures->find(albedoFilenames[i]));
 			meshes[i]->draw(core);
 		}
 	}

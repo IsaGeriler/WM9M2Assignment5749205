@@ -114,7 +114,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		character.toggleAlternateFireMode(&window, dt);
 		character.shoot(&window, dt);
 
-		// TO:DO - Camera Control via Mouse (Arrow Keys for now)
+		// TO:DO - Camera Control via Arrow Keys
 		//if (window.keys[VK_UP]) camera.pitch(1.f * dt);
 		//if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
 		if (window.keys[VK_LEFT]) camera.rotateY(1.f * dt);

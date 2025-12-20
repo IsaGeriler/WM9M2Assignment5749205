@@ -12,9 +12,13 @@
 class StaticModel {
 public:
 	std::vector<Mesh*> meshes;
+
 	std::vector<std::string> albedoFilenames;
 	std::vector<std::string> normalFilenames;
 	std::vector<std::string> roughnessFilenames;
+
+	std::string shadername;
+	std::string psoname;
 	
 	void load(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, std::string filename) {
 		GEMLoader::GEMModelLoader loader;
@@ -41,27 +45,26 @@ public:
 			mesh->initialize(core, vertices, gemmeshes[i].indices);
 			meshes.push_back(mesh);
 		}
-		shaders->loadShader(core, "StaticModelTextured", "VertexShaderStatic.txt", "PixelShaderMultipleTextured.txt");
-		psos->createPSO(core, "StaticModelPSO", shaders->getShader("StaticModelTextured")->vertexShader, shaders->getShader("StaticModelTextured")->pixelShader, VertexLayoutCache::getStaticLayout());
+		shadername = "StaticModelTextured";
+		psoname = "StaticModelPSO";
+		shaders->loadShader(core, shadername, "VertexShaderStatic.txt", "PixelShaderMultipleTextured.txt");
+		psos->createPSO(core, psoname, shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getStaticLayout());
 	}
 
 	void draw(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, Matrix& vp, Matrix& w) {
-		psos->bind(core, "StaticModelPSO");
-		shaders->updateConstantVertexShaderBuffer("StaticModelTextured", "staticMeshBuffer", "W", &w);
-		shaders->updateConstantVertexShaderBuffer("StaticModelTextured", "staticMeshBuffer", "VP", &vp);
-		shaders->apply(core, "StaticModelTextured");
+		psos->bind(core, psoname);
+		shaders->updateConstantVertexShaderBuffer(shadername, "staticMeshBuffer", "W", &w);
+		shaders->updateConstantVertexShaderBuffer(shadername, "staticMeshBuffer", "VP", &vp);
+		shaders->apply(core, shadername);
 
 		for (int i = 0; i < meshes.size(); i++) {
 			std::cout << albedoFilenames[i] << ' ' << textures->find(albedoFilenames[i]) << '\n';
 			std::cout << normalFilenames[i] << ' ' << textures->find(normalFilenames[i]) << '\n';
 			std::cout << roughnessFilenames[i] << ' ' << textures->find(roughnessFilenames[i]) << '\n';
 
-			// Normal map can be found in gemmeshes[i].material.find("nh").getValue()
-			// The rgb channels contain the normal map, and the alpha channel contains a height map
-
-			shaders->updateTexturePS(core, "StaticModelTextured", "albedoTexture", textures->find(albedoFilenames[i]));
-			shaders->updateTexturePS(core, "StaticModelTextured", "normalsTexture", textures->find(normalFilenames[i]));
-			shaders->updateTexturePS(core, "StaticModelTextured", "roughnessTexture", textures->find(roughnessFilenames[i]));
+			shaders->updateTexturePS(core, shadername, "albedoTexture", textures->find(albedoFilenames[i]));
+			shaders->updateTexturePS(core, shadername, "normalsTexture", textures->find(normalFilenames[i]));
+			shaders->updateTexturePS(core, shadername, "roughnessTexture", textures->find(roughnessFilenames[i]));
 			
 			meshes[i]->draw(core);
 		}
@@ -122,12 +125,10 @@ public:
 			std::cout << normalFilenames[i] << ' ' << textures->find(normalFilenames[i]) << '\n';
 			std::cout << roughnessFilenames[i] << ' ' << textures->find(roughnessFilenames[i]) << '\n';
 
-			// Normal map can be found in gemmeshes[i].material.find("nh").getValue()
-			// The rgb channels contain the normal map, and the alpha channel contains a height map
-
 			shaders->updateTexturePS(core, shadername, "albedoTexture", textures->find(albedoFilenames[i]));
 			shaders->updateTexturePS(core, shadername, "normalsTexture", textures->find(normalFilenames[i]));
 			shaders->updateTexturePS(core, shadername, "roughnessTexture", textures->find(roughnessFilenames[i]));
+
 			meshes[i]->draw(core);
 		}
 	}
