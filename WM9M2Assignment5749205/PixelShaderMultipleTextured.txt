@@ -21,12 +21,12 @@ float4 PS(PS_INPUT input) : SV_Target0 {
 	float3x3 TBN = float3x3(tangent, binormal, normal);
 
 	// Convert View direction into texture space
-	float3 cameraPosition = float3(1.5, 0.2, 0.0);
+	float3 cameraPosition = float3(0.0, 0.0, 1.0);
 	float3 viewDirWorld = normalize(cameraPosition - input.Pos.xyz);
 	float3 viewDirTS = mul(viewDirWorld, transpose(TBN));
  
 	// Step through texture space until intersection, compute step size (heightscale is the depth of the displacement)
-	float heightScale = 0.05;
+	float heightScale = 0.04;
 	float numSteps = 16.0;
 	float3 scaledViewDir = viewDirTS * heightScale;
 	float stepSize = 1.0 / numSteps;
@@ -58,11 +58,11 @@ float4 PS(PS_INPUT input) : SV_Target0 {
 	if (colour.a < 0.5) discard;
 
 	// Rotate lighting into normal map space
-	float3 lightDir = float3(0.5, 1.0, 0.3);
+	float3 lightDir = float3(0.1, 0.1, 0.1);
 	float3 localLightDir = normalize(mul(lightDir, transpose(TBN)));
 
 	// Compute lighting with new normal
-	float3 lightColour = float3(1.0, 0.75, 0.45);
+	float3 lightColour = float3(1.0, 0.9, 0.8);
 	float3 diffuse = (colour.rgb / PI) * lightColour * pow(max(dot(mapNormal.rgb, localLightDir), 0.0), power);
 	return float4(diffuse, colour.a);
 }
