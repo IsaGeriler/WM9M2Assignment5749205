@@ -68,6 +68,10 @@ static bool collisionAabbAabb(const AABB& object1, const AABB& object2) {
 	return pdx > 0 && pdy > 0 && pdz > 0;
 }
 
+static bool collisionSphereSphere(const BoundingSphere& object1, const BoundingSphere& object2) {
+	return (object1.centre - object2.centre).lengthSquare() <= powf((object1.radius + object2.radius), 2.f);
+}
+
 static bool collisionSphereAabb(const BoundingSphere& sphere, const AABB& aabb) {
 	// Find the closest point on AABB to Sphere centre
 	float px = std::max<float>(aabb.min.x, std::min<float>(sphere.centre.x, aabb.max.x));
