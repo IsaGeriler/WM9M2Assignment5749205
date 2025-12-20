@@ -115,12 +115,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		character.shoot(&window, dt);
 
 		// TO:DO - Camera Control via Arrow Keys
-		//if (window.keys[VK_UP]) camera.pitch(1.f * dt);
-		//if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
+		if (window.keys[VK_UP]) camera.pitch(1.f * dt);
+		if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
 		if (window.keys[VK_LEFT]) camera.rotateY(1.f * dt);
 		if (window.keys[VK_RIGHT]) camera.rotateY(-1.f * dt);
 
-		Matrix planeWorld = Matrix::identity() * Matrix::scale(Vec3(100.f, 100.f, 100.f));
+		Matrix planeWorld = Matrix::translate(Vec3(0.f, -120.f, 0.f)) * Matrix::scale(Vec3(100.f, 100.f, 100.f));
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix sphereWorld = Matrix::identity() * Matrix::rotateOnYAxis(M_PI);
 		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::translate(Vec3(-5.f, 1.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);

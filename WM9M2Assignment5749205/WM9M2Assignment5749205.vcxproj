@@ -137,6 +137,7 @@
     <ClInclude Include="GEMLoader.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MyMath.h" />
+    <ClInclude Include="NPC.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="PSOManager.h" />
     <ClInclude Include="Shaders.h" />

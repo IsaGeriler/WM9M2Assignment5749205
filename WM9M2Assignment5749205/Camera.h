@@ -5,7 +5,7 @@
 class Camera {
 public:
 	// Camera Attributes
-	Vec3 position = Vec3(0.f, 0.f, 0.f);
+	Vec3 position = Vec3(0.f, 0.f, 0.f);  // Camera Position (eye/from)
 	Vec3 right = Vec3(1.f, 0.f, 0.f);
 	Vec3 up = Vec3(0.f, 1.f, 0.f);
 	Vec3 dir = Vec3(0.f, 0.f, 1.f);
@@ -45,10 +45,10 @@ public:
 		projection = Matrix::projection(width, height, zFar, zNear, fovTheta);
 	}
 
-	void walk(float d) { position += dir * d; }		 // W and S key movements (walk forward/backward)
-	void strafe(float d) { position += right * d; }  // A and D key movements (strafe left/right)
+	void walk(float d) { position += dir * d; position.y = 0.f; }	   // W and S key movements (walk forward/backward)
+	void strafe(float d) { position += right * d; position.y = 0.f; }  // A and D key movements (strafe left/right)
 
-	// Rotete up and to vector about the from vector
+	// Rotete up and dir/to vector about the right/from vector
 	void pitch(float angle) {
 		Matrix R = Matrix::rotateAxis(right, angle);
 		up = R.mulVec(up).normalize();
