@@ -1,5 +1,6 @@
 Texture2D albedoTexture : register(t0);
 Texture2D normalsTexture : register(t1);
+Texture2D roughnessTexture : register(t2);
 SamplerState samplerLinear : register(s0);
 
 struct PS_INPUT {
@@ -11,27 +12,26 @@ struct PS_INPUT {
 
 float4 PS(PS_INPUT input) : SV_Target0 {
 	// Parallax Occlusion Mapping
-	// Compute TBN
 	float PI = 3.14159265358979323846;
 	float3 normal = normalize(input.Normal);
 	float3 tangent = normalize(input.Tangent);
 	float3 binormal = normalize(cross(input.Normal, tangent));
+
+	// Compute TBN
 	float3x3 TBN = float3x3(tangent, binormal, normal);
 
 	// Convert View direction into texture space
-	float3 cameraPosition = float3(0.0, 0.0, -5.0);
+	float3 cameraPosition = float3(1.5, 0.2, 0.0);
 	float3 viewDirWorld = normalize(cameraPosition - input.Pos.xyz);
 	float3 viewDirTS = mul(viewDirWorld, transpose(TBN));
  
-	// Step through texture space until intersection
-	// Compute step size (heightscale is the depth of the displacement)
+	// Step through texture space until intersection, compute step size (heightscale is the depth of the displacement)
 	float heightScale = 0.05;
 	float numSteps = 16.0;
 	float3 scaledViewDir = viewDirTS * heightScale;
 	float stepSize = 1.0 / numSteps;
 
-	// Ray trace in texture space
-	// Step through texture until intersection found
+	// Ray trace in texture space, step through texture until intersection found
 	float2 currentTexCoords = input.TexCoords;
 	float currentHeight = 0;
 	for (int i = 0; i < numSteps; i++) {
@@ -41,25 +41,28 @@ float4 PS(PS_INPUT input) : SV_Target0 {
 		currentHeight += stepSize;
 	}
 
-	// float4 colour = albedoTexture.Sample(samplerLinear, input.TexCoords);
+	// Sample Albedo Map at the texture coordinates
 	float4 colour = albedoTexture.Sample(samplerLinear, currentTexCoords);
 
-	// Alpha Testing
-	if (colour.a < 0.5) discard;
-
 	// Sample Normal Map at the texture coordinates
-	// float3 mapNormal = normalsTexture.Sample(samplerLinear, input.TexCoords).xyz;
 	float3 mapNormal = normalsTexture.Sample(samplerLinear, currentTexCoords).xyz;
 	
 	// Reconstruct tangent space normal
 	mapNormal = mapNormal * 2.0 - 1.0;
+	
+	// Sample Roughness Map at the texture coordinates
+	float roughness = roughnessTexture.Sample(samplerLinear, currentTexCoords).r;
+	float power = pow(2.0, (1,0 - roughness) * 8.0);
+
+	// Alpha Testing
+	if (colour.a < 0.5) discard;
 
 	// Rotate lighting into normal map space
-	float3 lightDir = float3(1.0, 1.0, 1.0);
+	float3 lightDir = float3(0.5, 1.0, 0.3);
 	float3 localLightDir = normalize(mul(lightDir, transpose(TBN)));
 
 	// Compute lighting with new normal
-	float3 lightColour = float3(1.0, 1.0, 1.0);
-	float3 diffuse = (colour.rgb / PI) * lightColour * max(dot(mapNormal.rgb, localLightDir), 0.0);
+	float3 lightColour = float3(1.0, 0.75, 0.45);
+	float3 diffuse = (colour.rgb / PI) * lightColour * pow(max(dot(mapNormal.rgb, localLightDir), 0.0), power);
 	return float4(diffuse, colour.a);
 }
