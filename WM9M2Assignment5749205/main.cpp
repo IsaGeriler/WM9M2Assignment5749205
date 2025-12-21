@@ -165,7 +165,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		if (window.keys[VK_DOWN]) camera.pitch(-0.8f * dt);
 		if (window.keys[VK_LEFT]) camera.rotateY(0.8f * dt);
 		if (window.keys[VK_RIGHT]) camera.rotateY(-0.8f * dt);
-		if (window.keys['C'] == 1) camera.resetCamera();
 
 		// Player Control
 		character.movePlayer(&camera, &window, dt);

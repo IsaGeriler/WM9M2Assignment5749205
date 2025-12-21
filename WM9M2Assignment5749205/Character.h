@@ -4,6 +4,7 @@
 
 #include "AnimatedModel.h"
 #include "Camera.h"
+#include "Collision.h"
 #include "Core.h"
 #include "MyMath.h"
 #include "Window.h"
@@ -40,6 +41,7 @@ std::string getAnimationByState(State state) {
 class Character {
 private:
 	AnimationInstance animationInstance;
+	BoundingSphere hitbox;
 	State state;
 
 	int bulletsInClip{ 30 };
@@ -64,6 +66,8 @@ public:
 		animatedModel.load(core, psos, textures, shaders, filename);
 		animationInstance.initialize(&animatedModel.animation, 0);
 		state = Pose;
+		hitbox.centre = Vec3(0.f, 0.f, 0.f);
+		hitbox.radius = 1.f;
 	}
 
 	void setAnimationState(State _state) { state = _state; }
@@ -103,6 +107,7 @@ public:
 			positionX += speed * dt;
 		}
 		camera->updateViewMatrix();
+		hitbox.centre = camera->position;
 	}
 
 	// Inspect Weapon

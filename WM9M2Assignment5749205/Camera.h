@@ -62,12 +62,4 @@ public:
 		up = R.mulVec(up).normalize();
 		dir = R.mulVec(dir).normalize();
 	}
-	
-	// Reset Camera
-	void resetCamera() {
-		position = Vec3(0.f, 0.f, 0.f);
-		right = Vec3(1.f, 0.f, 0.f);
-		up = Vec3(0.f, 1.f, 0.f);
-		dir = Vec3(0.f, 0.f, 1.f);
-	}
 };

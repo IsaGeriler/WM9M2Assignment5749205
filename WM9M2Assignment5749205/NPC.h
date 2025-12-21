@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AnimatedModel.h"
+#include "Collision.h"
 #include "Core.h"
 
 enum NPCState {
@@ -29,6 +30,7 @@ std::string getNPCAnimationByState(NPCState npcstate) {
 class NPC {
 private:
 	AnimationInstance animationInstance;
+	BoundingSphere hitbox;
 	NPCState npcstate;
 
 	int health{ 5000 };
@@ -50,6 +52,7 @@ public:
 		animatedModel.load(core, psos, textures, shaders, filename);  // "Models/TRex.gem"
 		animationInstance.initialize(&animatedModel.animation, 0);
 		npcstate = NPCWalk;
+		hitbox.radius = 2.f;
 	}
 
 	void takeDamage(int damage) {
