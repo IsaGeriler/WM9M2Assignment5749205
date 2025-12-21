@@ -86,16 +86,16 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			INSTANCE_DATA insGrassQ3;
 			INSTANCE_DATA insGrassQ4;
 			
-			insGrassQ1.world = Matrix::translate(Vec3((float)i * 50.f, -280.f, (float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+			insGrassQ1.world = Matrix::translate(Vec3((float)i * 50.f, -300.f, (float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
 			instancesGrass.push_back(insGrassQ1);
 			
-			insGrassQ2.world = Matrix::translate(Vec3(-(float)i * 50.f, -280.f, (float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+			insGrassQ2.world = Matrix::translate(Vec3(-(float)i * 50.f, -300.f, (float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
 			instancesGrass.push_back(insGrassQ2);
 
-			insGrassQ3.world = Matrix::translate(Vec3((float)i * 50.f, -280.f, -(float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+			insGrassQ3.world = Matrix::translate(Vec3((float)i * 50.f, -300.f, -(float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
 			instancesGrass.push_back(insGrassQ3);
 
-			insGrassQ4.world = Matrix::translate(Vec3(-(float)i * 50.f, -280.f, -(float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+			insGrassQ4.world = Matrix::translate(Vec3(-(float)i * 50.f, -300.f, -(float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
 			instancesGrass.push_back(insGrassQ4);
 		}
 	}
@@ -103,8 +103,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	instancedTree.load(&core, &psos, &textures, &shaders, "Models/banana2.gem", instances);
 	instancedGrass.load(&core, &psos, &textures, &shaders, "Models/grass_008.gem", instancesGrass);
 
-	StaticModel foodWarmer;
-	foodWarmer.load(&core, &psos, &textures, &shaders, "Models/Food_Warmer_07a.gem");
+	StaticModel truck;
+	truck.load(&core, &psos, &textures, &shaders, "Models/Truck_02b.gem");
 
 	AnimatedModel trex;
 	trex.load(&core, &psos, &textures, &shaders, "Models/TRex.gem");
@@ -147,23 +147,23 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		if (window.keys['F'] == 1) character.shoot();
 		character.animate(dt);
 
-		Matrix planeWorld = Matrix::translate(Vec3(0.f, -120.f, 0.f)) * Matrix::scale(Vec3(100.f, 100.f, 100.f));
+		Matrix planeWorld = Matrix::identity();
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix sphereWorld = Matrix::identity() * Matrix::rotateOnYAxis(M_PI);
 		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::translate(Vec3(-5.f, 1.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
-		Matrix foodWarmerWorld = Matrix::scale(Vec3(2.f, 2.f, 2.f)) * Matrix::translate(Vec3(0.f, 0.f, 3.f)) * Matrix::rotateOnYAxis(M_PI);
-		Matrix trexWorld = Matrix::translate(Vec3(0.f, -140.f, 0.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
-		Matrix characterWorld = Matrix::scale(Vec3(0.3f, 0.3f, 0.3f)) * Matrix::rotateOnYAxis(M_PI) * Matrix::translate(Vec3(0.f, 1.f, 0.f)) * camera.view.invert();
+		Matrix truckWorld = Matrix::translate(Vec3(-10.f, -2.f, 0.f)) * Matrix::rotateOnYAxis(M_PI / 4);
+		Matrix trexWorld = Matrix::translate(Vec3(0.f, -160.f, -2000.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+		Matrix characterWorld = Matrix::scale(Vec3(0.3f, 0.3f, 0.3f)) * Matrix::rotateOnYAxis(M_PI) * Matrix::translate(Vec3(0.f, 1.5f, 0.f)) * camera.view.invert();
 
 		core.beginRenderPass();
 
-		// cube.draw(&core, &psos, &shaders, vp, cubeWorld);
+		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		plane.draw(&core, &psos, &shaders, vp, planeWorld);
 		acacia.draw(&core, &psos, &textures, &shaders, vp, acaciaWorld);
-		// foodWarmer.draw(&core, &psos, &textures, &shaders, vp, foodWarmerWorld);
+		truck.draw(&core, &psos, &textures, &shaders, vp, truckWorld);
 
-		// cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
-		// cube.draw(&core, &psos, &shaders, vp, cubeWorld);
+		cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
+		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		
 		animatedInstance.update("run", dt);
 		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
