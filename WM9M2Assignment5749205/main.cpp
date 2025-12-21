@@ -5,6 +5,7 @@
 #include "Core.h"
 #include "Character.h"
 #include "Cube.h"
+#include "NPC.h"
 #include "Mesh.h"
 #include "Plane.h"
 #include "PSOManager.h"
@@ -114,6 +115,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	Character character;
 	character.initialize(&core, &psos, &textures, &shaders, "Models/AutomaticCarbine.gem");
 	
+	NPC npc;
+	npc.initialize(&core, &psos, &textures, &shaders, "Models/TRex.gem");
+
 	Timer timer;
 	float time = 0.f;
 
@@ -153,6 +157,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::translate(Vec3(-5.f, 1.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix truckWorld = Matrix::translate(Vec3(-10.f, -2.f, 0.f)) * Matrix::rotateOnYAxis(M_PI / 4);
 		Matrix trexWorld = Matrix::translate(Vec3(0.f, -160.f, -2000.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+		Matrix trexWorld2 = Matrix::translate(Vec3(110.f, -160.f, -1000.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix characterWorld = Matrix::scale(Vec3(0.3f, 0.3f, 0.3f)) * Matrix::rotateOnYAxis(M_PI) * Matrix::translate(Vec3(0.f, 1.5f, 0.f)) * camera.view.invert();
 
 		core.beginRenderPass();
@@ -168,6 +173,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		animatedInstance.update("run", dt);
 		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
 		trex.draw(&core, &animatedInstance, &textures, &psos, &shaders, vp, trexWorld);
+
+		npc.animate(dt);
+		npc.draw(&core, &textures, &psos, &shaders, vp, trexWorld2);
 		
 		character.draw(&core, &textures, &psos, &shaders, vp, characterWorld);
 		instancedTree.draw(&core, &psos, &textures, &shaders, vp);

@@ -4,24 +4,24 @@
 #include "Core.h"
 
 enum NPCState {
-	Attack,
-	Death,
-	Idle,
-	Idle2,
-	Roar,
-	Run,
-	Walk
+	NPCAttack,
+	NPCDeath,
+	NPCIdle,
+	NPCIdle2,
+	NPCRoar,
+	NPCRun,
+	NPCWalk
 };
 
 std::string getNPCAnimationByState(NPCState npcstate) {
 	switch (npcstate) {
-		case Attack: { return "attack"; break; }
-		case Death: { return "death"; break; }
-		case Idle: { return "idle"; break; }
-		case Idle2: { return "idle2"; break; }
-		case Roar: { return "roar"; break; }
-		case Run: { return "run"; break; }
-		case Walk: { return "walk"; break; }
+		case NPCAttack: { return "attack"; break; }
+		case NPCDeath: { return "death"; break; }
+		case NPCIdle: { return "idle"; break; }
+		case NPCIdle2: { return "idle2"; break; }
+		case NPCRoar: { return "roar"; break; }
+		case NPCRun: { return "run"; break; }
+		case NPCWalk: { return "walk"; break; }
 		default: { return "idle";  break; }
 	}
 }
@@ -39,13 +39,17 @@ private:
 	float sprintSpeed = 25.f;
 	float positionX{ 0.f };
 	float positionY{ 0.f };
+
+	void setAnimationState(NPCState _npcstate) { npcstate = _npcstate; }
+	void updateAnimation(float dt) { animationInstance.update(getNPCAnimationByState(npcstate), dt); }
+	void resetAnimationTime() { if (animationInstance.animationFinished() == true) animationInstance.resetAnimationTime(); }
 public:
 	AnimatedModel animatedModel;
 
 	void initialize(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, std::string filename) {
 		animatedModel.load(core, psos, textures, shaders, filename);  // "Models/TRex.gem"
 		animationInstance.initialize(&animatedModel.animation, 0);
-		npcstate = Idle;
+		npcstate = NPCWalk;
 	}
 
 	void takeDamage(int damage) {
@@ -53,8 +57,13 @@ public:
 		health -= damage;
 		if (health <= 0) {
 			isAlive = false;
-			npcstate = Death;
+			npcstate = NPCDeath;
 		}
+	}
+
+	void animate(float dt) {
+		updateAnimation(dt);
+		resetAnimationTime();
 	}
 
 	void draw(Core* core, TextureManager* textures, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
