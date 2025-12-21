@@ -14,4 +14,4 @@
 -	Simulating one or more effects covered in the lectures (e.g. water, particle system, skybox)
 
 ## Placeholder Image for the Current State of the Project
-<img width="1919" height="1129" alt="image" src="https://github.com/user-attachments/assets/5065183c-827b-4dc8-8eba-3181868c671a" />
+<img width="2559" height="1594" alt="image" src="https://github.com/user-attachments/assets/e19ba980-b5fb-466a-8b2b-ff3610257a8c" />
