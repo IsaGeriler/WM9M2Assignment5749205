@@ -149,6 +149,7 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="PixelShaderGrass.txt" />
     <Text Include="VertexShaderInstancedGrass.txt" />
     <Text Include="VertexShaderStaticInstanced.txt" />
   </ItemGroup>

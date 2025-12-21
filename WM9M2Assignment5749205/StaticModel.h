@@ -141,7 +141,6 @@ public:
 
 	std::vector<std::string> albedoFilenames;
 	std::vector<std::string> normalFilenames;
-	std::vector<std::string> roughnessFilenames;
 
 	std::string shadername;
 	std::string psoname;
@@ -163,18 +162,16 @@ public:
 			// Load texture with filename: gemmeshes[i].material.find("albedo").getValue()
 			albedoFilenames.push_back(gemmeshes[i].material.find("albedo").getValue());
 			normalFilenames.push_back(gemmeshes[i].material.find("nh").getValue());
-			roughnessFilenames.push_back(gemmeshes[i].material.find("rmax").getValue());
 
 			textures->loadTexture(core, albedoFilenames[i], gemmeshes[i].material.find("albedo").getValue());
 			textures->loadTexture(core, normalFilenames[i], gemmeshes[i].material.find("nh").getValue());
-			textures->loadTexture(core, roughnessFilenames[i], gemmeshes[i].material.find("rmax").getValue());
 
 			mesh->initialize(core, vertices, gemmeshes[i].indices, instances);
 			meshes.push_back(mesh);
 		}
 		shadername = "StaticModelTexturedVertexAnimInstanced";
 		psoname = "StaticModelInstancedVertexAnimPSO";
-		shaders->loadShader(core, shadername, "VertexShaderInstancedGrass.txt", "PixelShaderMultipleTextured.txt");
+		shaders->loadShader(core, shadername, "VertexShaderInstancedGrass.txt", "PixelShaderGrass.txt");
 		psos->createPSO(core, psoname, shaders->getShader(shadername)->vertexShader, shaders->getShader(shadername)->pixelShader, VertexLayoutCache::getStaticInstancedLayout());
 	}
 
@@ -187,11 +184,9 @@ public:
 		for (int i = 0; i < meshes.size(); i++) {
 			std::cout << albedoFilenames[i] << ' ' << textures->find(albedoFilenames[i]) << '\n';
 			std::cout << normalFilenames[i] << ' ' << textures->find(normalFilenames[i]) << '\n';
-			std::cout << roughnessFilenames[i] << ' ' << textures->find(roughnessFilenames[i]) << '\n';
 
 			shaders->updateTexturePS(core, shadername, "albedoTexture", textures->find(albedoFilenames[i]));
 			shaders->updateTexturePS(core, shadername, "normalsTexture", textures->find(normalFilenames[i]));
-			shaders->updateTexturePS(core, shadername, "roughnessTexture", textures->find(roughnessFilenames[i]));
 
 			meshes[i]->draw(core);
 		}

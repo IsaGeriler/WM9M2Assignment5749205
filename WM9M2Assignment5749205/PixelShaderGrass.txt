@@ -1,6 +1,5 @@
 Texture2D albedoTexture : register(t0);
 Texture2D normalsTexture : register(t1);
-Texture2D roughnessTexture : register(t2);
 SamplerState samplerLinear : register(s0);
 
 struct PS_INPUT {
@@ -44,18 +43,14 @@ float4 PS(PS_INPUT input) : SV_Target0 {
 	// Sample Albedo Map at the texture coordinates
 	float4 colour = albedoTexture.Sample(samplerLinear, currentTexCoords);
 
+	// Alpha Testing
+	if (colour.a < 0.5) discard;
+
 	// Sample Normal Map at the texture coordinates
 	float3 mapNormal = normalsTexture.Sample(samplerLinear, currentTexCoords).xyz;
 	
 	// Reconstruct tangent space normal
 	mapNormal = mapNormal * 2.0 - 1.0;
-	
-	// Sample Roughness Map at the texture coordinates
-	float roughness = roughnessTexture.Sample(samplerLinear, currentTexCoords).r;
-	float power = pow(2.0, (1.0 - roughness) * 10.0);
-
-	// Alpha Testing
-	if (colour.a < 0.5) discard;
 
 	// Rotate lighting into normal map space
 	float3 lightDir = float3(0.1, 0.1, 0.1);
@@ -63,6 +58,6 @@ float4 PS(PS_INPUT input) : SV_Target0 {
 
 	// Compute lighting with new normal
 	float3 lightColour = float3(1.0, 0.9, 0.8);
-	float3 diffuse = (colour.rgb / PI) * lightColour * pow(max(dot(mapNormal.rgb, localLightDir), 0.0), power);
+	float3 diffuse = (colour.rgb / PI) * lightColour * max(dot(mapNormal.rgb, localLightDir), 0.0);
 	return float4(diffuse, colour.a);
 }

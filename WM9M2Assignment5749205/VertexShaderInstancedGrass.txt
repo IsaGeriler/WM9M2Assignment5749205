@@ -20,9 +20,9 @@ struct PS_INPUT {
 
 PS_INPUT VS(VS_INPUT input) {
 	// Wind Attributes
-	float speed = 1.5;
-	float frequency = 0.5;
-	float amplitude = 0.2;
+	float speed = 1.25;
+	float frequency = 0.4;
+	float amplitude = 0.25;
 
 	float sway = sin(Time * speed + input.Pos.y * frequency) * amplitude;
 	float weight = input.Pos.y;

@@ -158,7 +158,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Matrix truckWorld = Matrix::translate(Vec3(-10.f, -2.f, 0.f)) * Matrix::rotateOnYAxis(M_PI / 4);
 		Matrix trexWorld = Matrix::translate(Vec3(0.f, -160.f, -2000.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix trexWorld2 = Matrix::translate(Vec3(110.f, -160.f, -1000.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
-		Matrix characterWorld = Matrix::scale(Vec3(0.3f, 0.3f, 0.3f)) * Matrix::rotateOnYAxis(M_PI) * Matrix::translate(Vec3(0.f, 1.5f, 0.f)) * camera.view.invert();
+		Matrix characterWorld = Matrix::scale(Vec3(0.3f, 0.3f, 0.3f)) * Matrix::rotateOnYAxis(M_PI) * Matrix::translate(Vec3(0.f, 1.1f, 0.f)) * camera.view.invert();
 
 		core.beginRenderPass();
 
