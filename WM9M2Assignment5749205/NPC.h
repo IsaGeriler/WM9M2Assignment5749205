@@ -36,7 +36,7 @@ private:
 	bool isAlive{ true };
 	
 	float movementSpeed = 2.5f;
-	float sprintSpeed = 20.f;
+	float sprintSpeed = 25.f;
 	float positionX{ 0.f };
 	float positionY{ 0.f };
 public:
@@ -58,6 +58,7 @@ public:
 	}
 
 	void draw(Core* core, TextureManager* textures, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
+		if (!isAlive && animationInstance.animationFinished()) return;
 		animatedModel.draw(core, &animationInstance, textures, psos, shaders, vp, w);
 	}
 };

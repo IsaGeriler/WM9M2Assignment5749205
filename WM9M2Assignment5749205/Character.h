@@ -12,8 +12,7 @@
 enum State {
 	Pose, Select, Putaway, EmptySelect, Idle,
 	Inspect, Walk, Run, Fire, AlternateFire,
-	MeleeAttack, ZoomIdle, ZoomWalk, ZoomFire,
-	ZoomAlternateFire, AlternateFireModeOn,
+	MeleeAttack, AlternateFireModeOn,
 	DryFire, Reload, EmptyReload
 };
 
@@ -30,10 +29,6 @@ std::string getAnimationByState(State state) {
 		case Fire: { return "08 fire"; break; }
 		case AlternateFire: { return "09 alternate fire"; break; }
 		case MeleeAttack: { return "10 melee attack"; break; }
-		case ZoomIdle: { return "11 zoom idle"; break; }
-		case ZoomWalk: { return "12 zoom walk"; break; }
-		case ZoomFire: { return "13 zoom fire"; break; }
-		case ZoomAlternateFire: { return "14 zoom alternate fire"; break; }
 		case AlternateFireModeOn: { return "15 alternate fire mode on"; break; }
 		case DryFire: { return "16 dryfire"; break; }
 		case Reload: { return "17 reload"; break; }
@@ -47,9 +42,10 @@ private:
 	AnimationInstance animationInstance;
 	State state;
 
-	int bulletsInClip{ 0 };
+	int bulletsInClip{ 30 };
 	int totalAmmo{ 240 };
 	int health{ 100 };
+	int bulletDamage{ 50 };
 
 	float movementSpeed = 5.f;
 	float sprintSpeed = 10.f;
@@ -80,9 +76,7 @@ public:
 
 	void movePlayer(Camera* camera, Window* window, float dt) {
 		float speed = (window->keys[VK_SHIFT] == 1) ? sprintSpeed : movementSpeed;
-		State state;
-		if (zoom) state = ZoomWalk;
-		else state = (window->keys[VK_SHIFT] == 1) ? Run : Walk;
+		State state = (window->keys[VK_SHIFT] == 1) ? Run : Walk;
 
 		// Camera and Player Movement via Keyboard
 		if (window->keys['W'] == 1 && carryGun) {
@@ -109,91 +103,77 @@ public:
 			positionX += speed * dt;
 		}
 		camera->updateViewMatrix();
-		animate(dt, true);
 	}
 
 	// Inspect Weapon
-	void inspectWeapon(Window* window, float dt) {
-		if (window->keys['I'] == 1 && carryGun) setAnimationState(Inspect);
-		if (animationInstance.animationFinished()) setAnimationState(Idle);
-		animate(dt, false);
+	void inspectWeapon() {
+		if (animationInstance.animationFinished()) { setAnimationState(Idle); return; }
+		if (carryGun) setAnimationState(Inspect);
 	}
 
 	// Perform Melee Attack (needs collision detection for damage)
-	void meleeAttack(Window* window, float dt) {
-		if (window->keys['M'] == 1 && carryGun) setAnimationState(MeleeAttack);
-		if (animationInstance.animationFinished()) setAnimationState(Idle);
-		animate(dt, false);
+	void meleeAttack() {
+		if (carryGun) setAnimationState(MeleeAttack);
+		if (animationInstance.animationFinished()) { setAnimationState(Idle); return; }
 	}
 
 	// Putaway the carbine
-	void putawayWeapon(Window* window, float dt) {
-		if (window->keys['P'] && carryGun == true) {
-			carryGun = false;
+	void putawayWeapon() {
+		if (carryGun) {
+			carryGun = !carryGun;
 			setAnimationState(Putaway);
 		}
-		if (animationInstance.animationFinished()) setAnimationState(Idle);
-		animate(dt, false);
+		if (animationInstance.animationFinished()) { setAnimationState(Idle); return; }
 	}
 
 	// Select the carbine
-	void selectWeapon(Window* window, float dt) {
-		if (window->keys['O'] && carryGun == false) {
-			carryGun = true;
-			if (bulletsInClip == 0) setAnimationState(EmptySelect);
-			else setAnimationState(Select);
+	void selectWeapon() {
+		if (!carryGun) {
+			carryGun = !carryGun;
+			State state = (bulletsInClip == 0) ? EmptySelect : Select;
+			setAnimationState(state);
 		}
-		if (animationInstance.animationFinished()) setAnimationState(Idle);
-		animate(dt, false);
+		if (animationInstance.animationFinished()) { setAnimationState(Idle); return; }
 	}
 
 	// Reload
-	void reload(Window* window, float dt) {
-		if (window->keys['R'] && (bulletsInClip < 30 && totalAmmo > 0)) {
+	void reload() {
+		if (bulletsInClip < 30 && totalAmmo > 0) {
 			State state = (bulletsInClip == 0) ? EmptyReload : Reload;
 			bulletsInClip = std::min<int>(30, totalAmmo);
 			totalAmmo -= bulletsInClip;
 			setAnimationState(state);
 		}
-		if (animationInstance.animationFinished()) setAnimationState(Idle);
-		animate(dt, false);
+		if (animationInstance.animationFinished()) { setAnimationState(Idle); return; }
 	}
 
 	// Toggle Alternate Fire Mode
-	void toggleAlternateFireMode(Window* window, float dt) {
-		if (window->keys[VK_SPACE]) {
-			toggleAlternateFire = !toggleAlternateFire;
-			setAnimationState(AlternateFireModeOn);
-		}
-		if (animationInstance.animationFinished()) setAnimationState(Idle);
-		animate(dt, false);
+	void toggleAlternateFireMode() {
+		toggleAlternateFire = !toggleAlternateFire;
+		setAnimationState(AlternateFireModeOn);
+		if (animationInstance.animationFinished()) { setAnimationState(Idle); return; }
 	}
 
 	// Shoot Bullet (needs collision detection for damage)
-	void shoot(Window* window, float dt) {
-		if (window->keys['F'] == 1) {
-			State state;
-			if (bulletsInClip > 0) {
-				int deduceBullet = (toggleAlternateFire) ? 3 : 1;
-				if (zoom) state = ZoomIdle;
-				else state = (toggleAlternateFire) ? Fire : AlternateFire;
-				bulletsInClip -= std::max<int>(deduceBullet, bulletsInClip);
-				setAnimationState(state);
-			} else {
-				setAnimationState(DryFire);
-			}
+	void shoot() {
+		State state;
+		if (bulletsInClip > 0) {
+			int deduceBullet = (toggleAlternateFire) ? 3 : 1;
+			state = (toggleAlternateFire) ? Fire : AlternateFire;
+			bulletsInClip -= std::max<int>(deduceBullet, bulletsInClip);
+			setAnimationState(state);
+		} else {
+			setAnimationState(DryFire);
 		}
-		if (animationInstance.animationFinished()) setAnimationState(Idle);
-		animate(dt, false);
+		if (animationInstance.animationFinished()) { setAnimationState(Idle); return; }
 	}
 
-	void animate(float dt, bool continuous) {
+	void animate(float dt) {
 		updateAnimation(dt);
-		if (continuous && animationInstance.animationFinished()) resetAnimationTime();
+		resetAnimationTime();
 	}
 
 	void resetAnimationState() {
-		if (zoom) state = ZoomIdle;
-		else state = Idle;
+		state = Idle;
 	}
 };

@@ -47,7 +47,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	cube.initialize(&core, &psos, &shaders);
 
 	Sphere sphere;
-	sphere.initialize(&core, &psos, &textures, &shaders, 32, 32, 1000.f);
+	sphere.initialize(&core, &psos, &textures, &shaders, 32, 32, 100.f);
 
 	StaticModel acacia;
 	acacia.load(&core, &psos, &textures, &shaders, "Models/banana2.gem");
@@ -58,21 +58,45 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	std::vector<INSTANCE_DATA> instances;
 	std::vector<INSTANCE_DATA> instancesGrass;
 	
-	for (int i = 1; i <= 10; i++) {
-		for (int j = 1; j <= 10; j++) {
-			INSTANCE_DATA ins;
+	for (int i = 1; i <= 24; i+=3) {
+		for (int j = 1; j <= 24; j+=3) {
+			INSTANCE_DATA insQ1;
+			INSTANCE_DATA insQ2;
+			INSTANCE_DATA insQ3;
+			INSTANCE_DATA insQ4;
 			
-			ins.world = Matrix::translate(Vec3((float)i * 200.f, -60.f, (float)j * 200.f)) * Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::rotateOnYAxis(M_PI);
-			instances.push_back(ins);
-			
+			insQ1.world = Matrix::translate(Vec3((float)i * 100.f, -65.f, (float)j * 100.f)) * Matrix::scale(Vec3(0.03f, 0.03f, 0.03f)) * Matrix::rotateOnYAxis(M_PI);
+			instances.push_back(insQ1);
+
+			insQ2.world = Matrix::translate(Vec3(-(float)i * 100.f, -65.f, (float)j * 100.f)) * Matrix::scale(Vec3(0.03f, 0.03f, 0.03f)) * Matrix::rotateOnYAxis(M_PI);
+			instances.push_back(insQ2);
+
+			insQ3.world = Matrix::translate(Vec3((float)i * 100.f, -65.f, -(float)j * 100.f)) * Matrix::scale(Vec3(0.03f, 0.03f, 0.03f)) * Matrix::rotateOnYAxis(M_PI);
+			instances.push_back(insQ3);
+
+			insQ4.world = Matrix::translate(Vec3(-(float)i * 100.f, -65.f, -(float)j * 100.f)) * Matrix::scale(Vec3(0.03f, 0.03f, 0.03f)) * Matrix::rotateOnYAxis(M_PI);
+			instances.push_back(insQ4);
 		}
 	}
-	for (int i = 1; i <= 20; i++) {
-		for (int j = 1; j <= 20; j++) {
-			if (i * 50 % 200 == 0 || j * 50 % 200) continue;
-			INSTANCE_DATA insGrass;
-			insGrass.world = Matrix::translate(Vec3((float)i * 50.f, -120.f, (float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
-			instancesGrass.push_back(insGrass);
+	for (int i = 1; i <= 136; i++) {
+		for (int j = 1; j <= 136; j++) {
+			if (i * 100 % 200 == 0 || j * 100 % 200) continue;
+			INSTANCE_DATA insGrassQ1;
+			INSTANCE_DATA insGrassQ2;
+			INSTANCE_DATA insGrassQ3;
+			INSTANCE_DATA insGrassQ4;
+			
+			insGrassQ1.world = Matrix::translate(Vec3((float)i * 50.f, -280.f, (float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+			instancesGrass.push_back(insGrassQ1);
+			
+			insGrassQ2.world = Matrix::translate(Vec3(-(float)i * 50.f, -280.f, (float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+			instancesGrass.push_back(insGrassQ2);
+
+			insGrassQ3.world = Matrix::translate(Vec3((float)i * 50.f, -280.f, -(float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+			instancesGrass.push_back(insGrassQ3);
+
+			insGrassQ4.world = Matrix::translate(Vec3(-(float)i * 50.f, -280.f, -(float)j * 50.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+			instancesGrass.push_back(insGrassQ4);
 		}
 	}
 
@@ -105,48 +129,46 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Matrix p = camera.projection;
 		Matrix vp = v * p;
 
-		character.movePlayer(&camera, &window, dt);
-		character.inspectWeapon(&window, dt);
-		character.meleeAttack(&window, dt);
-		character.selectWeapon(&window, dt);
-		character.putawayWeapon(&window, dt);
-		character.reload(&window, dt);
-		character.toggleAlternateFireMode(&window, dt);
-		character.shoot(&window, dt);
-
 		// Camera Control via Arrow Keys
-		if (window.keys[VK_UP]) camera.pitch(1.f * dt);
-		if (window.keys[VK_DOWN]) camera.pitch(-1.f * dt);
-		if (window.keys[VK_LEFT]) camera.rotateY(1.f * dt);
-		if (window.keys[VK_RIGHT]) camera.rotateY(-1.f * dt);
+		if (window.keys[VK_UP]) camera.pitch(0.8f * dt);
+		if (window.keys[VK_DOWN]) camera.pitch(-0.8f * dt);
+		if (window.keys[VK_LEFT]) camera.rotateY(0.8f * dt);
+		if (window.keys[VK_RIGHT]) camera.rotateY(-0.8f * dt);
 		if (window.keys['C'] == 1) camera.resetCamera();
 
 		// Player Control
-
+		character.movePlayer(&camera, &window, dt);
+		if (window.keys['I'] == 1) character.inspectWeapon();
+		if (window.keys['M'] == 1) character.meleeAttack();
+		if (window.keys['P'] == 1) character.putawayWeapon();
+		if (window.keys['O'] == 1) character.selectWeapon();
+		if (window.keys['R'] == 1) character.reload();
+		if (window.keys[VK_SPACE] == 1) character.toggleAlternateFireMode();
+		if (window.keys['F'] == 1) character.shoot();
+		character.animate(dt);
 
 		Matrix planeWorld = Matrix::translate(Vec3(0.f, -120.f, 0.f)) * Matrix::scale(Vec3(100.f, 100.f, 100.f));
 		Matrix cubeWorld = Matrix::translate(Vec3(-5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix sphereWorld = Matrix::identity() * Matrix::rotateOnYAxis(M_PI);
 		Matrix acaciaWorld = Matrix::scale(Vec3(0.02f, 0.02f, 0.02f)) * Matrix::translate(Vec3(-5.f, 1.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix foodWarmerWorld = Matrix::scale(Vec3(2.f, 2.f, 2.f)) * Matrix::translate(Vec3(0.f, 0.f, 3.f)) * Matrix::rotateOnYAxis(M_PI);
-		Matrix trexWorld = Matrix::translate(Vec3(0.f, -100.f, 0.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
+		Matrix trexWorld = Matrix::translate(Vec3(0.f, -140.f, 0.f)) * Matrix::scale(Vec3(0.01f, 0.01f, 0.01f)) * Matrix::rotateOnYAxis(M_PI);
 		Matrix characterWorld = Matrix::scale(Vec3(0.3f, 0.3f, 0.3f)) * Matrix::rotateOnYAxis(M_PI) * Matrix::translate(Vec3(0.f, 1.f, 0.f)) * camera.view.invert();
 
 		core.beginRenderPass();
 
-		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
+		// cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		plane.draw(&core, &psos, &shaders, vp, planeWorld);
 		acacia.draw(&core, &psos, &textures, &shaders, vp, acaciaWorld);
-		foodWarmer.draw(&core, &psos, &textures, &shaders, vp, foodWarmerWorld);
+		// foodWarmer.draw(&core, &psos, &textures, &shaders, vp, foodWarmerWorld);
 
-		cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
-		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
+		// cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
+		// cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		
 		animatedInstance.update("run", dt);
 		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
 		trex.draw(&core, &animatedInstance, &textures, &psos, &shaders, vp, trexWorld);
 		
-		// character.animate(dt);
 		character.draw(&core, &textures, &psos, &shaders, vp, characterWorld);
 		instancedTree.draw(&core, &psos, &textures, &shaders, vp);
 		instancedGrass.draw(&core, &psos, &textures, &shaders, vp);
