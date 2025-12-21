@@ -3,6 +3,7 @@
 
 #include "Camera.h"
 #include "Core.h"
+#include "Collision.h"
 #include "Character.h"
 #include "Cube.h"
 #include "NPC.h"
@@ -79,6 +80,32 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			instances.push_back(insQ4);
 		}
 	}
+
+	AABB bananaTreeAABB;
+	std::vector<AABB> bananaTreeAABBs;
+	bananaTreeAABB.min = Vec3(-100.f, -300.f, -100.f);
+	bananaTreeAABB.max = Vec3(100.f, 300.f, 100.f);
+
+	for (int i = 0; i < instances.size(); i++) {
+		AABB tree;
+		Vec3 treeCorners[8] = {
+			Vec3(bananaTreeAABB.min.x, bananaTreeAABB.min.y, bananaTreeAABB.min.z),
+			Vec3(bananaTreeAABB.max.x, bananaTreeAABB.min.y, bananaTreeAABB.min.z),
+			Vec3(bananaTreeAABB.min.x, bananaTreeAABB.max.y, bananaTreeAABB.min.z),
+			Vec3(bananaTreeAABB.min.x, bananaTreeAABB.min.y, bananaTreeAABB.max.z),
+			Vec3(bananaTreeAABB.max.x, bananaTreeAABB.max.y, bananaTreeAABB.min.z),
+			Vec3(bananaTreeAABB.max.x, bananaTreeAABB.min.y, bananaTreeAABB.max.z),
+			Vec3(bananaTreeAABB.min.x, bananaTreeAABB.max.y, bananaTreeAABB.max.z),
+			Vec3(bananaTreeAABB.max.x, bananaTreeAABB.max.y, bananaTreeAABB.max.z)
+		};
+
+		for (int j = 0; j < 8; j++) {
+			Vec3 aabbWorld = instances[i].world.mulPoint(treeCorners[j]);
+			tree.extend(aabbWorld);
+		}
+		bananaTreeAABBs.push_back(tree);
+	}
+
 	for (int i = 1; i <= 136; i++) {
 		for (int j = 1; j <= 136; j++) {
 			if (i * 100 % 200 == 0 || j * 100 % 200) continue;
