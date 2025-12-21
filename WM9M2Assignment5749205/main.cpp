@@ -53,7 +53,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	acacia.load(&core, &psos, &textures, &shaders, "Models/banana2.gem");
 
 	StaticInstancedModel instancedTree;
-	StaticInstancedModel instancedGrass;
+	StaticInstancedVertexAnimModel instancedGrass;
 
 	std::vector<INSTANCE_DATA> instances;
 	std::vector<INSTANCE_DATA> instancesGrass;
@@ -157,13 +157,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		core.beginRenderPass();
 
-		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
+		//cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		plane.draw(&core, &psos, &shaders, vp, planeWorld);
 		acacia.draw(&core, &psos, &textures, &shaders, vp, acaciaWorld);
 		truck.draw(&core, &psos, &textures, &shaders, vp, truckWorld);
 
 		cubeWorld = Matrix::translate(Vec3(5.f, 0.f, 0.f)) * Matrix::rotateOnYAxis(M_PI);
-		cube.draw(&core, &psos, &shaders, vp, cubeWorld);
+		//cube.draw(&core, &psos, &shaders, vp, cubeWorld);
 		
 		animatedInstance.update("run", dt);
 		if (animatedInstance.animationFinished() == true) animatedInstance.resetAnimationTime();
@@ -171,7 +171,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		
 		character.draw(&core, &textures, &psos, &shaders, vp, characterWorld);
 		instancedTree.draw(&core, &psos, &textures, &shaders, vp);
-		instancedGrass.draw(&core, &psos, &textures, &shaders, vp);
+		instancedGrass.draw(&core, &psos, &textures, &shaders, vp, time);
 		sphere.draw(&core, &psos, &textures, &shaders, vp, sphereWorld);
 
 		core.finishFrame();

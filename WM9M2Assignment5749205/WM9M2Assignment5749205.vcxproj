@@ -149,6 +149,7 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="VertexShaderInstancedGrass.txt" />
     <Text Include="VertexShaderStaticInstanced.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -52,7 +52,7 @@ float4 PS(PS_INPUT input) : SV_Target0 {
 	
 	// Sample Roughness Map at the texture coordinates
 	float roughness = roughnessTexture.Sample(samplerLinear, currentTexCoords).r;
-	float power = pow(2.0, (1,0 - roughness) * 8.0);
+	float power = pow(2.0, (1,0 - roughness) * 10.0);
 
 	// Alpha Testing
 	if (colour.a < 0.5) discard;
