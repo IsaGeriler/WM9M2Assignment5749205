@@ -36,6 +36,7 @@ private:
 	int health{ 5000 };
 
 	bool isAlive{ true };
+	bool isAttacking{ false };
 	
 	float movementSpeed = 2.5f;
 	float sprintSpeed = 25.f;
@@ -61,6 +62,15 @@ public:
 		if (health <= 0) {
 			isAlive = false;
 			npcstate = NPCDeath;
+		}
+	}
+
+	void attack(Character* character, int damage) {
+		if (!isAttacking) return;
+		npcstate = NPCRoar;
+		if (collisionSphereSphere(character->hitbox, this->hitbox)) {
+			npcstate = NPCRoar;
+			character->takeDamage(damage);
 		}
 	}
 

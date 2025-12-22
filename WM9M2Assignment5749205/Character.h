@@ -41,7 +41,6 @@ std::string getAnimationByState(State state) {
 class Character {
 private:
 	AnimationInstance animationInstance;
-	BoundingSphere hitbox;
 	State state;
 
 	int bulletsInClip{ 30 };
@@ -57,10 +56,12 @@ private:
 	bool carryGun = true;
 	bool toggleAlternateFire = false;
 	bool zoom = false;
+	bool isAlive = true;
 
 	int animCounter{ 0 };
 public:
 	AnimatedModel animatedModel;
+	BoundingSphere hitbox;
 
 	void initialize(Core* core, PSOManager* psos, TextureManager* textures, ShaderManager* shaders, std::string filename) {
 		animatedModel.load(core, psos, textures, shaders, filename);
@@ -75,6 +76,7 @@ public:
 	void resetAnimationTime() { if (animationInstance.animationFinished() == true) animationInstance.resetAnimationTime(); }
 
 	void draw(Core* core, TextureManager* textures, PSOManager* psos, ShaderManager* shaders, Matrix& vp, Matrix& w) {
+		if (!isAlive) return;
 		animatedModel.draw(core, &animationInstance, textures, psos, shaders, vp, w);
 	}
 
@@ -171,6 +173,15 @@ public:
 			setAnimationState(DryFire);
 		}
 		if (animationInstance.animationFinished()) { setAnimationState(Idle); return; }
+	}
+
+	void takeDamage(int damage) {
+		if (!isAlive) return;
+		health -= damage;
+		if (health <= 0) {
+			isAlive = false;
+			return;
+		}
 	}
 
 	void animate(float dt) {
